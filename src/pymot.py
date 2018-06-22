@@ -80,7 +80,8 @@ if __name__ == "__main__":
     print(T.timestep())
     T.save_to_csv_v0(fno)
     print("ok")
-    T.time_interpolate(np.array([2, 2.015, 2.3]))
+    print(T.x[:5,:])
+    T.time_interpolate(np.array([0, 0.015, 0.03]))
     print(T.summary())
     print(T.x)
     pass
