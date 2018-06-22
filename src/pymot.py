@@ -1,15 +1,29 @@
+"""Coordinates for Multiple Object Tracking
+
+Track object contains time, x- and y-coordinates of variable number of
+moving objects.
+
+"""
+
 import numpy as np
-import timeit
 
 class Track:
+    """Track object
+
+    """
     def __init__(self):
+        """The constructor creates an empty object with data set to None
+        """
         self.x = None
         self.y = None
         self.time = None
         self.n_objects = 0
-        pass
+
 
     def load_from_csv_v0(self, filename):
+        """Initializes object from data file.
+        Uses format from RepMot/RevMot studies.
+        """
         mat = np.genfromtxt(filename, delimiter='\t')
         # first column
 
@@ -26,62 +40,91 @@ class Track:
         pass
 
     def save_to_csv_v0(self, filename):
+        """Saves object's data to file
+
+        Mimics classic format. The main difference in the use of
+        scientific notation and longer precision.
+        """
         nrow = len(self.time)
-        at   = self.time.reshape((nrow, 1))
-        axy  = np.zeros((nrow, 2 * self.n_objects))
-        axy[:, 0::2] = self.x
-        axy[:, 1::2] = self.y
-        mat = np.concatenate((at, axy), axis = 1)
+        new_time = self.time.reshape((nrow, 1))
+        new_xy = np.zeros((nrow, 2 * self.n_objects))
+        new_xy[:, 0::2] = self.x
+        new_xy[:, 1::2] = self.y
+        mat = np.concatenate((new_time, new_xy), axis=1)
         np.savetxt(filename, mat, delimiter="\t")
 
-    def move(self, dx, dy):
-        self.x += dx
-        self.y += dy
+    def move(self, difference):
+        """Shifts all x,y by constant.
 
-    def scale(self, f):
-        self.x *= f
-        self.y *= f
+        Expects array or tuple
+        """
+        self.x += difference[0]
+        self.y += difference[1]
+
+    def scale(self, factor):
+        """Multiplies all x,y by constant
+
+        """
+        self.x *= factor
+        self.y *= factor
 
     def timestep(self):
+        """Estimates size of time steps in timeline
+        """
         return np.mean(np.diff(self.time))
 
     def time_interpolate(self, newtime):
-        n = len(newtime)
-        nx = np.zeros((n, self.n_objects))
-        ny = np.zeros((n, self.n_objects))
-        for o in range(self.n_objects):
-            nx[:, o] = np.interp(newtime, self.time, self.x[:, o])
-            ny[:, o] = np.interp(newtime, self.time, self.y[:, o])
-        self.x = nx
-        self.y = ny
+        """Interpolates data according to new timeline
+
+        Does not check the validity of new time
+        (ascending order, being within time limits)
+        """
+        nrow_new = len(newtime)
+        newx = np.zeros((nrow_new, self.n_objects))
+        newy = np.zeros((nrow_new, self.n_objects))
+        for index in range(self.n_objects):
+            newx[:, index] = np.interp(newtime, self.time, self.x[:, index])
+            newy[:, index] = np.interp(newtime, self.time, self.y[:, index])
+        self.x = newx
+        self.y = newy
         self.time = newtime
 
     def load_from_csv(self, filename):
+        """Initializes object from data file.
+
+        Calls classic format. Maybe add format detection in future.
+        """
         return self.load_from_csv_v0(filename)
 
     def save_to_csv(self, filename):
+        """Saves object's data to file
+
+        Defaults to classic format.
+        """
         return self.save_to_csv_v0(filename)
 
     def summary(self):
+        """Returns text summary
+        """
         if (not self.x is None) and (not self.y is None) and (not self.time is None):
-            return "Track: {} objects, time {} - {}".format(self.n_objects, np.amin(self.time), np.amax(self.time))
+            return "Track: {} objects, time {} - {}".format(
+                self.n_objects, np.amin(self.time), np.amax(self.time))
         else:
             return "Track: NOT initialized"
 
 if __name__ == "__main__":
     # execute only if run as a script
     T = Track()
-    fn = "../examples/data/T220.csv"
-    fno = "../tmp/T220new.csv"
-    T.load_from_csv(fn)
+    fn_in = "./examples/data/T220.csv"
+    fn_out = "./tmp/T220new.csv"
+    T.load_from_csv(fn_in)
     #print(T.mat.shape)
     print(T.summary())
     print(T.time[4:10])
     print(T.timestep())
-    T.save_to_csv_v0(fno)
+    T.save_to_csv_v0(fn_out)
     print("ok")
-    print(T.x[:5,:])
+    print(T.x[:5, :])
     T.time_interpolate(np.array([0, 0.015, 0.03]))
     print(T.summary())
     print(T.x)
-    pass
