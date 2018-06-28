@@ -112,6 +112,26 @@ class Track:
         else:
             return "Track: NOT initialized"
 
+class Puppeteer:
+    """
+    Gets Track data and move PsychoPy stimuli objects accordingly
+    """
+
+    def __init__(self):
+        """The constructor creates an empty object
+        """
+        self.objects = []
+        self.track = None
+
+    def position_for_time(self, timevalue):
+        n_objects = self.track.n_objects
+        newx = np.zeros((1, n_objects))
+        newy = np.zeros((1, n_objects))
+        for index in range(n_objects):
+            newx[:, index] = np.interp(timevalue, self.track.time, self.track.x[:, index])
+            newy[:, index] = np.interp(timevalue, self.track.time, self.track.y[:, index])
+        return (newx, newy)
+
 if __name__ == "__main__":
     # execute only if run as a script
     T = Track()
@@ -124,7 +144,10 @@ if __name__ == "__main__":
     print(T.timestep())
     T.save_to_csv_v0(fn_out)
     print("ok")
-    print(T.x[:5, :])
-    T.time_interpolate(np.array([0, 0.015, 0.03]))
+    # print(T.x[:5, :])
+    # T.time_interpolate(np.array([0, 0.015, 0.03]))
     print(T.summary())
-    print(T.x)
+    # print(T.x)
+    P = Puppeteer()
+    P.track = T
+    print(P.position_for_time(0.1))
