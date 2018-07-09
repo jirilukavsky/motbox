@@ -31,38 +31,38 @@
       <CodeComponent name="code">
         <Param name="Begin Experiment" updates="constant" val="import pymot&amp;#10;&amp;#10;track_filename = &quot;../examples/data/T220.csv&quot;&amp;#10;&amp;#10;" valType="extendedCode"/>
         <Param name="name" updates="None" val="code" valType="code"/>
-        <Param name="Begin Routine" updates="constant" val="T = pymot.Track()&amp;#10;T.load_from_csv(track_filename)&amp;#10;T.scale(0.1)&amp;#10;P = pymot.Puppeteer()&amp;#10;P.track = T&amp;#10;&amp;#10;" valType="extendedCode"/>
+        <Param name="Begin Routine" updates="constant" val="T = pymot.Track()&amp;#10;T.load_from_csv(track_filename)&amp;#10;T.scale(30) # px per inch&amp;#10;&amp;#10;P = pymot.Puppeteer()&amp;#10;P.track = T&amp;#10;P.clone_template_psychopy(p1_template, 4)&amp;#10;&amp;#10;" valType="extendedCode"/>
         <Param name="End Routine" updates="constant" val="" valType="extendedCode"/>
         <Param name="End Experiment" updates="constant" val="" valType="extendedCode"/>
-        <Param name="Each Frame" updates="constant" val="if t &gt;= 0 and t &lt;= 5:&amp;#10;    (x, y) = P.position_for_time(t)&amp;#10;    #print x[:,0]&amp;#10;    #print (float(x[:,0]), float(y[:,0]))&amp;#10;    o1.pos = (float(x[:,0]), float(y[:,0]))&amp;#10;    p1.pos = (float(x[:,1]), float(y[:,1]))&amp;#10;    pass" valType="extendedCode"/>
+        <Param name="Each Frame" updates="constant" val="stop_time = 4&amp;#10;if t &gt;= 0 and t &lt;= stop_time:&amp;#10;    map(lambda x: x.setAutoDraw(True), P.objects)&amp;#10;    P.update_positions_psychopy(t)&amp;#10;&amp;#10;if t &gt; stop_time and t &lt;= (stop_time + 1):&amp;#10;    map(lambda x: x.setAutoDraw(True), P.objects)&amp;#10;    P.update_positions_psychopy(4)&amp;#10;&amp;#10;if t &gt; (stop_time + 1):&amp;#10;    map(lambda x: x.setAutoDraw(False), P.objects)&amp;#10;" valType="extendedCode"/>
       </CodeComponent>
-      <PolygonComponent name="o1">
-        <Param name="lineColorSpace" updates="constant" val="rgb" valType="str"/>
-        <Param name="pos" updates="constant" val="(0, 0)" valType="code"/>
-        <Param name="fillColorSpace" updates="constant" val="rgb" valType="str"/>
-        <Param name="shape" updates="constant" val="rectangle" valType="str"/>
-        <Param name="startVal" updates="None" val="0.0" valType="code"/>
-        <Param name="size" updates="constant" val="(0.1, 0.1)" valType="code"/>
-        <Param name="fillColor" updates="constant" val="$[1,1,1]" valType="str"/>
-        <Param name="units" updates="None" val="from exp settings" valType="str"/>
-        <Param name="nVertices" updates="constant" val="4" valType="int"/>
+      <ImageComponent name="p1_template">
         <Param name="opacity" updates="constant" val="1" valType="code"/>
-        <Param name="stopVal" updates="constant" val="" valType="code"/>
+        <Param name="flipVert" updates="constant" val="False" valType="bool"/>
+        <Param name="colorSpace" updates="constant" val="rgb" valType="str"/>
+        <Param name="flipHoriz" updates="constant" val="False" valType="bool"/>
+        <Param name="name" updates="None" val="p1_template" valType="code"/>
+        <Param name="color" updates="constant" val="$[1,1,1]" valType="str"/>
+        <Param name="stopVal" updates="constant" val="1.0" valType="code"/>
         <Param name="durationEstim" updates="None" val="" valType="code"/>
+        <Param name="mask" updates="constant" val="None" valType="str"/>
+        <Param name="pos" updates="constant" val="(10000, 10000)" valType="code"/>
         <Param name="interpolate" updates="constant" val="linear" valType="str"/>
         <Param name="startEstim" updates="None" val="" valType="code"/>
+        <Param name="units" updates="None" val="pix" valType="str"/>
+        <Param name="texture resolution" updates="constant" val="128" valType="code"/>
         <Param name="startType" updates="None" val="time (s)" valType="str"/>
         <Param name="ori" updates="constant" val="0" valType="code"/>
         <Param name="stopType" updates="None" val="duration (s)" valType="str"/>
-        <Param name="name" updates="None" val="o1" valType="code"/>
-        <Param name="lineColor" updates="constant" val="$[1,1,1]" valType="str"/>
-        <Param name="lineWidth" updates="constant" val="1" valType="code"/>
-      </PolygonComponent>
+        <Param name="startVal" updates="None" val="0.0" valType="code"/>
+        <Param name="image" updates="constant" val="img/happy-50-green.png" valType="str"/>
+        <Param name="size" updates="constant" val="(64, 64)" valType="code"/>
+      </ImageComponent>
       <KeyboardComponent name="key_resp_2">
         <Param name="correctAns" updates="constant" val="" valType="str"/>
         <Param name="storeCorrect" updates="constant" val="False" valType="bool"/>
         <Param name="name" updates="None" val="key_resp_2" valType="code"/>
-        <Param name="stopVal" updates="constant" val="" valType="code"/>
+        <Param name="stopVal" updates="constant" val="5" valType="code"/>
         <Param name="durationEstim" updates="None" val="" valType="code"/>
         <Param name="forceEndRoutine" updates="constant" val="True" valType="bool"/>
         <Param name="startEstim" updates="None" val="" valType="code"/>
@@ -74,28 +74,6 @@
         <Param name="store" updates="constant" val="nothing" valType="str"/>
         <Param name="syncScreenRefresh" updates="constant" val="True" valType="bool"/>
       </KeyboardComponent>
-      <ImageComponent name="p1">
-        <Param name="opacity" updates="constant" val="1" valType="code"/>
-        <Param name="flipVert" updates="constant" val="False" valType="bool"/>
-        <Param name="colorSpace" updates="constant" val="rgb" valType="str"/>
-        <Param name="flipHoriz" updates="constant" val="False" valType="bool"/>
-        <Param name="name" updates="None" val="p1" valType="code"/>
-        <Param name="color" updates="constant" val="$[1,1,1]" valType="str"/>
-        <Param name="stopVal" updates="constant" val="" valType="code"/>
-        <Param name="durationEstim" updates="None" val="" valType="code"/>
-        <Param name="mask" updates="constant" val="None" valType="str"/>
-        <Param name="pos" updates="constant" val="(0, 0)" valType="code"/>
-        <Param name="interpolate" updates="constant" val="linear" valType="str"/>
-        <Param name="startEstim" updates="None" val="" valType="code"/>
-        <Param name="units" updates="None" val="from exp settings" valType="str"/>
-        <Param name="texture resolution" updates="constant" val="128" valType="code"/>
-        <Param name="startType" updates="None" val="time (s)" valType="str"/>
-        <Param name="ori" updates="constant" val="0" valType="code"/>
-        <Param name="stopType" updates="None" val="duration (s)" valType="str"/>
-        <Param name="startVal" updates="None" val="0.0" valType="code"/>
-        <Param name="image" updates="constant" val="img/icons8-happy-50.png" valType="str"/>
-        <Param name="size" updates="constant" val="(0.1, 0.1)" valType="code"/>
-      </ImageComponent>
     </Routine>
   </Routines>
   <Flow>

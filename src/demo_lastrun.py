@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """
 This experiment was created using PsychoPy2 Experiment Builder (v1.90.2),
-    on Thu Jun 28 16:44:57 2018
+    on Mon Jul  9 16:00:47 2018
 If you publish work using this script please cite the PsychoPy publications:
     Peirce, JW (2007) PsychoPy - Psychophysics software in Python.
         Journal of Neuroscience Methods, 162(1-2), 8-13.
@@ -72,20 +72,13 @@ import pymot
 track_filename = "../examples/data/T220.csv"
 
 
-o1 = visual.Rect(
-    win=win, name='o1',
-    width=(0.1, 0.1)[0], height=(0.1, 0.1)[1],
-    ori=0, pos=(0, 0),
-    lineWidth=1, lineColor=[1,1,1], lineColorSpace='rgb',
-    fillColor=[1,1,1], fillColorSpace='rgb',
-    opacity=1, depth=-1.0, interpolate=True)
-p1 = visual.ImageStim(
-    win=win, name='p1',
-    image=u'img/icons8-happy-50.png', mask=None,
-    ori=0, pos=(0, 0), size=(0.1, 0.1),
+p1_template = visual.ImageStim(
+    win=win, name='p1_template',units='pix', 
+    image=u'img/happy-50-green.png', mask=None,
+    ori=0, pos=(10000, 10000), size=(64, 64),
     color=[1,1,1], colorSpace='rgb', opacity=1,
     flipHoriz=False, flipVert=False,
-    texRes=128, interpolate=True, depth=-3.0)
+    texRes=128, interpolate=True, depth=-1.0)
 
 # Create some handy timers
 globalClock = core.Clock()  # to track the time since experiment started
@@ -96,41 +89,52 @@ t = 0
 trialClock.reset()  # clock
 frameN = -1
 continueRoutine = True
+routineTimer.add(5.500000)
 # update component parameters for each repeat
 T = pymot.Track()
 T.load_from_csv(track_filename)
-T.scale(0.1)
+T.scale(30) # px per inch
+
 P = pymot.Puppeteer()
 P.track = T
+P.clone_template_psychopy(p1_template, 4)
 
 
 key_resp_2 = event.BuilderKeyResponse()
 # keep track of which components have finished
-trialComponents = [o1, key_resp_2, p1]
+trialComponents = [p1_template, key_resp_2]
 for thisComponent in trialComponents:
     if hasattr(thisComponent, 'status'):
         thisComponent.status = NOT_STARTED
 
 # -------Start Routine "trial"-------
-while continueRoutine:
+while continueRoutine and routineTimer.getTime() > 0:
     # get current time
     t = trialClock.getTime()
     frameN = frameN + 1  # number of completed frames (so 0 is the first frame)
     # update/draw components on each frame
-    if t >= 0 and t <= 5:
-        (x, y) = P.position_for_time(t)
-        #print x[:,0]
-        #print (float(x[:,0]), float(y[:,0]))
-        o1.pos = (float(x[:,0]), float(y[:,0]))
-        p1.pos = (float(x[:,1]), float(y[:,1]))
-        pass
+    stop_time = 4
+    if t >= 0 and t <= stop_time:
+        map(lambda x: x.setAutoDraw(True), P.objects)
+        P.update_positions_psychopy(t)
     
-    # *o1* updates
-    if t >= 0.0 and o1.status == NOT_STARTED:
+    if t > stop_time and t <= (stop_time + 1):
+        map(lambda x: x.setAutoDraw(True), P.objects)
+        P.update_positions_psychopy(4)
+    
+    if t > (stop_time + 1):
+        map(lambda x: x.setAutoDraw(False), P.objects)
+    
+    
+    # *p1_template* updates
+    if t >= 0.0 and p1_template.status == NOT_STARTED:
         # keep track of start time/frame for later
-        o1.tStart = t
-        o1.frameNStart = frameN  # exact frame index
-        o1.setAutoDraw(True)
+        p1_template.tStart = t
+        p1_template.frameNStart = frameN  # exact frame index
+        p1_template.setAutoDraw(True)
+    frameRemains = 0.0 + 1.0- win.monitorFramePeriod * 0.75  # most of one frame period left
+    if p1_template.status == STARTED and t >= frameRemains:
+        p1_template.setAutoDraw(False)
     
     # *key_resp_2* updates
     if t >= 0.5 and key_resp_2.status == NOT_STARTED:
@@ -140,6 +144,9 @@ while continueRoutine:
         key_resp_2.status = STARTED
         # keyboard checking is just starting
         event.clearEvents(eventType='keyboard')
+    frameRemains = 0.5 + 5- win.monitorFramePeriod * 0.75  # most of one frame period left
+    if key_resp_2.status == STARTED and t >= frameRemains:
+        key_resp_2.status = STOPPED
     if key_resp_2.status == STARTED:
         theseKeys = event.getKeys(keyList=['space'])
         
@@ -149,13 +156,6 @@ while continueRoutine:
         if len(theseKeys) > 0:  # at least one key was pressed
             # a response ends the routine
             continueRoutine = False
-    
-    # *p1* updates
-    if t >= 0.0 and p1.status == NOT_STARTED:
-        # keep track of start time/frame for later
-        p1.tStart = t
-        p1.frameNStart = frameN  # exact frame index
-        p1.setAutoDraw(True)
     
     # check if all components have finished
     if not continueRoutine:  # a component has requested a forced-end of Routine
@@ -179,8 +179,6 @@ for thisComponent in trialComponents:
     if hasattr(thisComponent, "setAutoDraw"):
         thisComponent.setAutoDraw(False)
 
-# the Routine "trial" was not non-slip safe, so reset the non-slip timer
-routineTimer.reset()
 
 # these shouldn't be strictly necessary (should auto-save)
 thisExp.saveAsWideText(filename+'.csv')
