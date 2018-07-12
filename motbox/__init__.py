@@ -1,4 +1,6 @@
-__all__ = ["pymot"]
+__all__ = ["Track", "Puppeteer"]
 
-from .track import Track
-from .control import Puppeteer
+from . import track
+from track import Track
+from . import control
+from control import Puppeteer
