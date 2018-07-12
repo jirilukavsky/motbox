@@ -10,6 +10,7 @@ import numpy as np
 class Track:
     """Track object
 
+    - x - numpy 2D-array (dim1 = time, dim2 = objects)
     """
     def __init__(self):
         """The constructor creates an empty object with data set to None
