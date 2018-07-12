@@ -105,6 +105,6 @@ venv.bak/
 
 tmp/
 
-src/data/
+demo/data/
 
-src/demo_lastrun.py
+demo/demo_lastrun.py

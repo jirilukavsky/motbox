@@ -1,5 +1,5 @@
 import unittest
-import pymot
+import src.pymot
 
 class TestTrack(unittest.TestCase):
     # https://docs.python.org/2/library/unittest.html
