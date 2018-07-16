@@ -7,6 +7,7 @@ moving objects.
 
 import numpy as np
 from scipy.spatial import distance
+import matplotlib.pyplot as plt
 
 class Position(object):
     """Represents position of n objects or one timeslice of Track
@@ -15,8 +16,8 @@ class Position(object):
     def __init__(self, x=None, y=None):
         """Constructor
         """
-        self.x = np.array(x)
-        self.y = np.array(y)
+        self.x = np.array(x, dtype=float)
+        self.y = np.array(y, dtype=float)
         if x is None:
             self.n_objects = 0
         else:
@@ -43,11 +44,52 @@ class Position(object):
                 break
         return self
 
+    def circular_positions(self, n, radius, center=(0,0)):
+        """Put n objects on a circle with given center and diameter
+        """
+        n_range = np.arange(n)
+        self.x = center[0] + radius * np.sin(n_range * 2 * np.pi / n)
+        self.y = center[1] + radius * np.cos(n_range * 2 * np.pi / n)
+        self.n_objects = n
+        return self
+
+    def move(self, difference):
+        """Shifts all x,y by constant.
+
+        Expects array or tuple
+        """
+        self.x += difference[0]
+        self.y += difference[1]
+
+    def scale(self, factor):
+        """Multiplies all x,y by constant
+
+        """
+        self.x *= factor
+        self.y *= factor
+
+    def jitter_positions(self, amount, method="normal"):
+        if method in ["normal"]:
+            jitter = np.random.normal(scale=amount, size=(2, self.n_objects))
+        if method in ["uniform"]:
+            jitter = np.random.uniform(low=-amount, high=amount, size=(2, self.n_objects))
+        self.move((jitter[0,:], jitter[1,:]))
+
+    def plot(self, filename, xlim=(-10,10), ylim=(-10,10)):
+        plt.plot(self.x, self.y, "o")
+        plt.xlabel = "x"
+        plt.ylabel = "y"
+        plt.xlim(xlim)
+        plt.ylim(ylim)
+        plt.savefig(filename)
+
 
 class Track(object):
     """Track object
 
     - x - numpy 2D-array (dim1 = time, dim2 = objects)
+    - y - numpy 2D-array (dim1 = time, dim2 = objects)
+    - time - numpy 1D-array
     """
     def __init__(self):
         """The constructor creates an empty object with data set to None

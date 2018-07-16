@@ -22,6 +22,19 @@ class TestPosition(unittest.TestCase):
         """Does it work? And is min distance tested?
         """
         min_distance = 4
-        P = Position()
-        P.random_positions(8, (-10, 10), (-10, 10), min_distance)
+        P = Position().random_positions(8, (-10, 10), (-10, 10), min_distance)
         self.assertTrue(P.is_min_distance_complied(min_distance))
+
+    def test_circular_positions(self):
+        """Does it work?
+        """
+        P = Position().circular_positions(7, 5)
+        self.assertAlmostEqual(P.y[0], 5.)
+
+    def test_jitter_positions(self):
+        """Are all coordinates changed?
+        """
+        original_x = self.P2.x.copy()
+        original_y = self.P2.y.copy()
+        self.P2.jitter_positions(1, method="uniform")
+        self.assertFalse(np.any(self.P2.x == original_x) or np.any(self.P2.y == original_y))
