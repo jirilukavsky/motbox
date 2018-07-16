@@ -1,7 +1,11 @@
-import numpy as np
-import copy
+"""Controlling PsychoPy objects using Track data
 
-class Puppeteer:
+In future we may add other experiment frameworks, e.g., OpenSesame
+"""
+import copy
+import numpy as np
+
+class Puppeteer(object):
     """
     Gets Track data and move PsychoPy stimuli objects accordingly
     """
@@ -31,7 +35,7 @@ class Puppeteer:
         n_track_objects = self.track.n_objects
         n_screen_objects = len(self.objects)
         for index in range(min(n_track_objects, n_screen_objects)):
-            self.objects[index].pos = (float(newx[:,index]), float(newy[:,index]))
+            self.objects[index].pos = (float(newx[:, index]), float(newy[:, index]))
 
     def clone_template_psychopy(self, psychopyobject, ntimes):
         """Populates objects array by copies of given PsychoPy object

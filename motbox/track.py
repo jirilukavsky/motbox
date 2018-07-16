@@ -6,8 +6,45 @@ moving objects.
 """
 
 import numpy as np
+from scipy.spatial import distance
 
-class Track:
+class Position(object):
+    """Represents position of n objects or one timeslice of Track
+    """
+
+    def __init__(self, x=None, y=None):
+        """Constructor
+        """
+        self.x = np.array(x)
+        self.y = np.array(y)
+        if x is None:
+            self.n_objects = 0
+        else:
+            self.n_objects = len(x)
+
+    def is_min_distance_complied(self, min_distance):
+        """Checks if objects' distances are smaller than specified value
+        """
+        coords = np.zeros((self.n_objects, 2))
+        coords[:, 0] = self.x
+        coords[:, 1] = self.y
+        dist = distance.pdist(coords)
+        return np.all(dist > min_distance)
+
+    def random_positions(self, n, xlim, ylim, min_distance):
+        """Populates square ares (xlim x ylim) with n objects.
+        Checks minimum inter-object distance
+        """
+        while True:
+            self.n_objects = n
+            self.x = np.random.uniform(low=xlim[0], high=xlim[1], size=(n, ))
+            self.y = np.random.uniform(low=ylim[0], high=ylim[1], size=(n, ))
+            if self.is_min_distance_complied(min_distance):
+                break
+        return self
+
+
+class Track(object):
     """Track object
 
     - x - numpy 2D-array (dim1 = time, dim2 = objects)
@@ -116,20 +153,4 @@ class Track:
 
 if __name__ == "__main__":
     # execute only if run as a script
-    T = Track()
-    fn_in = "./examples/data/T220.csv"
-    fn_out = "./tmp/T220new.csv"
-    T.load_from_csv(fn_in)
-    #print(T.mat.shape)
-    print(T.summary())
-    print(T.time[4:10])
-    print(T.timestep())
-    T.save_to_csv_v0(fn_out)
-    print("ok")
-    # print(T.x[:5, :])
-    # T.time_interpolate(np.array([0, 0.015, 0.03]))
-    print(T.summary())
-    # print(T.x)
-    P = Puppeteer()
-    P.track = T
-    print(P.position_for_time(0.1))
+    pass
