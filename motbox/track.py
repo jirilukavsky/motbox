@@ -44,7 +44,7 @@ class Position(object):
                 break
         return self
 
-    def circular_positions(self, n, radius, center=(0,0)):
+    def circular_positions(self, n, radius, center=(0, 0)):
         """Put n objects on a circle with given center and diameter
         """
         n_range = np.arange(n)
@@ -69,13 +69,18 @@ class Position(object):
         self.y *= factor
 
     def jitter_positions(self, amount, method="normal"):
+        """Adds uniform or normal jitter to existing positions
+        """
         if method in ["normal"]:
             jitter = np.random.normal(scale=amount, size=(2, self.n_objects))
         if method in ["uniform"]:
             jitter = np.random.uniform(low=-amount, high=amount, size=(2, self.n_objects))
-        self.move((jitter[0,:], jitter[1,:]))
+        self.move((jitter[0, :], jitter[1, :]))
 
-    def plot(self, filename, xlim=(-10,10), ylim=(-10,10)):
+    def plot(self, filename, xlim=(-10, 10), ylim=(-10, 10)):
+        """Plots positions into file
+        """
+        plt.figure()
         plt.plot(self.x, self.y, "o")
         plt.xlabel = "x"
         plt.ylabel = "y"
@@ -192,6 +197,53 @@ class Track(object):
         else:
             return "Track: NOT initialized"
 
+    def plot(self, filename, xlim=(-10, 10), ylim=(-10, 10)):
+        """Plots trajectories into a file
+        """
+        plt.figure()
+        plt.plot(self.x, self.y)
+        plt.xlabel = "x"
+        plt.ylabel = "y"
+        plt.xlim(xlim)
+        plt.ylim(ylim)
+        plt.savefig(filename)
+
+    def bounce_square(self, position, direction, arena_opts):
+        """Checks for boundary bouncing and returns corrected directions
+        """
+        xlim = arena_opts["xlim"]
+        ylim = arena_opts["ylim"]
+        #tx = position.x + 
+        pass
+
+
+    def generate_vonmises(self, position, speed, kappa,
+                          time=None, direction=None):
+        """Generates trajectories from starting positions and von Mises sampling
+        """
+        if not time is None:
+            self.time = time
+        timestep = self.timestep()
+        n = position.n_objects
+        if direction is None:
+            direction = np.random.uniform(low=0., high=2*np.pi, size=(n,))
+        self.x = np.zeros((len(self.time), n))
+        self.y = np.zeros((len(self.time), n))
+        step = speed * timestep
+        self.x[0, :] = position.x
+        self.y[0, :] = position.y
+        for frame in range(1, len(self.time)):
+            # check collisions and boundary
+
+            tx = self.x[frame - 1, :] + np.sin(direction) * step
+            ty = self.y[frame - 1, :] + np.cos(direction) * step
+
+            # store coordinates
+            self.x[frame, :] = tx
+            self.y[frame, :] = ty
+            # update direction
+            direction += np.random.vonmises(mu=0, kappa=kappa, size=direction.shape)
+        return self
 
 if __name__ == "__main__":
     # execute only if run as a script

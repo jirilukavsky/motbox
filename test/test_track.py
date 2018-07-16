@@ -51,6 +51,19 @@ class TestTrack(unittest.TestCase):
         step = self.T1.timestep()
         self.assertAlmostEqual(step, 0.01)
 
+    def test_generate_vonmises(self):
+        #, position, speed, kappa, time=None, direction=None):
+        self.T1.generate_vonmises(
+            Position().circular_positions(8, 5),
+            5.,
+            4)
+        self.T1.plot("test_generated.png")
+        self.assertTrue(True)
+
+    def test_plot(self):
+        self.T1.plot("test_trajectory.png")
+        self.assertTrue(True)
+
     # def test_move_numpy_2d(self):
     #     self.T1.move((self.matrix_28))
     #     pass
