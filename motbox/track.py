@@ -7,7 +7,11 @@ moving objects.
 
 import numpy as np
 from scipy.spatial import distance
+from scipy.sparse import csgraph
 import matplotlib.pyplot as plt
+
+from moviepy.editor import VideoClip
+from moviepy.video.io.bindings import mplfig_to_npimage
 
 class Position(object):
     """Represents position of n objects or one timeslice of Track
@@ -174,6 +178,17 @@ class Track(object):
         self.y = newy
         self.time = newtime
 
+    def position_for_time(self, timevalue):
+        """Interpolates coordinates for given time point
+        """
+        n_objects = self.n_objects
+        newx = np.zeros((1, n_objects))
+        newy = np.zeros((1, n_objects))
+        for index in range(n_objects):
+            newx[:, index] = np.interp(timevalue, self.time, self.x[:, index])
+            newy[:, index] = np.interp(timevalue, self.time, self.y[:, index])
+        return (newx, newy)
+
     def load_from_csv(self, filename):
         """Initializes object from data file.
 
@@ -208,13 +223,62 @@ class Track(object):
         plt.ylim(ylim)
         plt.savefig(filename)
 
+    def make_video(self, filename, xlim=(-10, 10), ylim=(-10, 10)):
+        WIDTH = 600
+        HEIGHT = 600
+        DPI = 150
+        FPS = 15
+        DURATION = np.max(self.time) - np.min(self.time)
+
+        fig, axis = plt.subplots(figsize=(1.0 * WIDTH / DPI, 1.0 * HEIGHT / DPI), dpi=DPI)
+        def make_frame(t):
+            axis.clear()
+            (tx, ty) = self.position_for_time(t + np.min(self.time))
+            axis.plot(tx, ty, "o")
+            axis.set_xlim(xlim)
+            axis.set_ylim(ylim)
+            axis.set_title("Time {:.2f} s".format(t))
+            return mplfig_to_npimage(fig)
+        animation = VideoClip(make_frame, duration=DURATION)
+        #animation.write_gif(filename, fps=FPS)
+        animation.write_videofile(filename, fps=FPS)
+        pass
+
     def bounce_square(self, position, direction, arena_opts):
         """Checks for boundary bouncing and returns corrected directions
         """
         xlim = arena_opts["xlim"]
         ylim = arena_opts["ylim"]
-        #tx = position.x + 
-        pass
+        too_R = position.x > xlim[1]
+        too_L = position.x < xlim[0]
+        too_U = position.y < ylim[0]
+        too_D = position.y > ylim[1]
+        too_horizontal = np.logical_or(too_R, too_L)
+        too_vertical = np.logical_or(too_U, too_D)
+        corner = np.logical_and(too_horizontal, too_vertical)
+        side = np.logical_xor(too_horizontal, too_vertical)
+        direction[corner] = np.mod(direction[corner] + np.pi, 2 * np.pi)
+        direction[np.logical_and(side, too_horizontal)] = 2 * np.pi - direction[np.logical_and(side, too_horizontal)]
+        direction[np.logical_and(side, too_vertical)] = np.mod(np.pi - direction[np.logical_and(side, too_vertical)], 2 * np.pi)
+        return direction
+
+    def bounce_objects(self, position, direction, opts):
+        """Checks for minimum inter-object spacing
+        """
+        spacing = opts["spacing"]
+        coords = np.zeros((position.n_objects, 2))
+        coords[:, 0] = position.x
+        coords[:, 1] = position.y
+        distances = distance.squareform(distance.pdist(coords)) < spacing
+        n_groups, grouping = csgraph.connected_components(distances)
+        for group_code in range(n_groups):
+            count = np.sum(grouping == group_code)
+            if count == 2:
+                direction[grouping == group_code] = direction[grouping == group_code][::-1]
+            if count > 2:
+                direction[grouping == group_code] = np.mod(direction[grouping == group_code] + np.pi, 2 * np.pi)
+        return direction
+
 
 
     def generate_vonmises(self, position, speed, kappa,
@@ -233,7 +297,15 @@ class Track(object):
         self.x[0, :] = position.x
         self.y[0, :] = position.y
         for frame in range(1, len(self.time)):
-            # check collisions and boundary
+            # check boundary
+            direction_old = direction.copy()
+            direction = self.bounce_square(position, direction,
+                {"xlim": (-10, 10), "ylim": (-10, 10)})
+            # check collisions
+            direction_old = direction.copy()
+            direction = self.bounce_objects(position, direction, {"spacing":2.})
+
+            position.move((np.sin(direction) * step, np.cos(direction) * step))
 
             tx = self.x[frame - 1, :] + np.sin(direction) * step
             ty = self.y[frame - 1, :] + np.cos(direction) * step

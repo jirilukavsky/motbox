@@ -3,6 +3,8 @@ import numpy as np
 from numpy import testing
 from motbox import *
 
+COMPLETE = False
+
 class TestTrack(unittest.TestCase):
     # https://docs.python.org/2/library/unittest.html
     # http://pythontesting.net/framework/unittest/unittest-introduction/
@@ -51,39 +53,26 @@ class TestTrack(unittest.TestCase):
         step = self.T1.timestep()
         self.assertAlmostEqual(step, 0.01)
 
+    @unittest.skipUnless(COMPLETE, "Time consuming video generation")
     def test_generate_vonmises(self):
         #, position, speed, kappa, time=None, direction=None):
         self.T1.generate_vonmises(
             Position().circular_positions(8, 5),
             5.,
-            4)
+            40)
         self.T1.plot("test_generated.png")
+        self.T1.make_video("test_generated.mp4")
         self.assertTrue(True)
 
     def test_plot(self):
         self.T1.plot("test_trajectory.png")
         self.assertTrue(True)
 
-    # def test_move_numpy_2d(self):
-    #     self.T1.move((self.matrix_28))
-    #     pass
+    @unittest.skipUnless(COMPLETE, "Time consuming video generation")
+    def test_make_video(self):
+        self.T1.make_video("test_video.mp4")
+        self.assertTrue(True)
 
 # if __name__ == '__main__':
 #     unittest.main()
 #
-#     def move(self, difference):
-#         """Shifts all x,y by constant.
-#
-#         Expects array or tuple
-#         """
-#         self.x += difference[0]
-#         self.y += difference[1]
-#
-#     def scale(self, factor):
-#         """Multiplies all x,y by constant
-#
-#         """
-#         self.x *= factor
-#         self.y *= factor
-##
-#     def time_interpolate(self, newtime):

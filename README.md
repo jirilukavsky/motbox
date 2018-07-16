@@ -6,4 +6,4 @@ Use `pylint motbox/*.py` or `pylint motbox/yourfile.py`
 
 ## Unit tests
 
-Use `python -m unittest discover test` at tom folder level.
+Use `python -m unittest discover test` at top folder level.

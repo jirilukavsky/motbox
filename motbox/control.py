@@ -16,22 +16,11 @@ class Puppeteer(object):
         self.objects = []
         self.track = None
 
-    def position_for_time(self, timevalue):
-        """Interpolates coordinates for given time point
-        """
-        n_objects = self.track.n_objects
-        newx = np.zeros((1, n_objects))
-        newy = np.zeros((1, n_objects))
-        for index in range(n_objects):
-            newx[:, index] = np.interp(timevalue, self.track.time, self.track.x[:, index])
-            newy[:, index] = np.interp(timevalue, self.track.time, self.track.y[:, index])
-        return (newx, newy)
-
     def update_positions_psychopy(self, timevalue):
         """Updates the controlled objects' positions to coordinates based on
         given time point
         """
-        (newx, newy) = self.position_for_time(timevalue)
+        (newx, newy) = self.track.position_for_time(timevalue)
         n_track_objects = self.track.n_objects
         n_screen_objects = len(self.objects)
         for index in range(min(n_track_objects, n_screen_objects)):
