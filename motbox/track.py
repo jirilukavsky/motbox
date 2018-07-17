@@ -216,28 +216,32 @@ class Track(object):
         """Plots trajectories into a file
         """
         plt.figure()
-        plt.plot(self.x, self.y)
+        plt.plot(self.x, self.y, "k")
         plt.xlabel = "x"
         plt.ylabel = "y"
         plt.xlim(xlim)
         plt.ylim(ylim)
         plt.savefig(filename)
 
-    def make_video(self, filename, xlim=(-10, 10), ylim=(-10, 10)):
-        WIDTH = 600
+    def make_video(self, filename, xlim=(-10, 10), ylim=(-10, 10), callback=None, axisOff=True):
+        WIDTH = 900
         HEIGHT = 600
         DPI = 150
-        FPS = 15
+        FPS = 25
         DURATION = np.max(self.time) - np.min(self.time)
 
         fig, axis = plt.subplots(figsize=(1.0 * WIDTH / DPI, 1.0 * HEIGHT / DPI), dpi=DPI)
         def make_frame(t):
             axis.clear()
             (tx, ty) = self.position_for_time(t + np.min(self.time))
-            axis.plot(tx, ty, "o")
+            axis.plot(tx, ty, "ko")
             axis.set_xlim(xlim)
             axis.set_ylim(ylim)
             axis.set_title("Time {:.2f} s".format(t))
+            if not callback is None:
+                callback(axis)
+            if axisOff:
+                plt.axis('off')
             return mplfig_to_npimage(fig)
         animation = VideoClip(make_frame, duration=DURATION)
         #animation.write_gif(filename, fps=FPS)
@@ -281,10 +285,11 @@ class Track(object):
 
 
 
-    def generate_vonmises(self, position, speed, kappa,
+    def generate_vonmises(self, position, speed, kappa, opts,
                           time=None, direction=None):
         """Generates trajectories from starting positions and von Mises sampling
         """
+        # opt = {"xlim": (-10, 10), "ylim": (-10, 10), "spacing":2.}
         if not time is None:
             self.time = time
         timestep = self.timestep()
@@ -293,17 +298,17 @@ class Track(object):
             direction = np.random.uniform(low=0., high=2*np.pi, size=(n,))
         self.x = np.zeros((len(self.time), n))
         self.y = np.zeros((len(self.time), n))
+        self.n_objects = n
         step = speed * timestep
         self.x[0, :] = position.x
         self.y[0, :] = position.y
         for frame in range(1, len(self.time)):
             # check boundary
             direction_old = direction.copy()
-            direction = self.bounce_square(position, direction,
-                {"xlim": (-10, 10), "ylim": (-10, 10)})
+            direction = self.bounce_square(position, direction, opts)
             # check collisions
             direction_old = direction.copy()
-            direction = self.bounce_objects(position, direction, {"spacing":2.})
+            direction = self.bounce_objects(position, direction, opts)
 
             position.move((np.sin(direction) * step, np.cos(direction) * step))
 
