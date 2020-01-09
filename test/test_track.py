@@ -1,14 +1,13 @@
-"""Unittests for t
+"""Unittests for track
 """
 
-import unittest
+import unittest, os, re
 import numpy as np
 from numpy import testing
 from motbox import Track, Position
 
-
 COMPLETE = False
-
+track_data_path = os.path.join("test", "tracks", "T220.csv")
 
 class TestTrack(unittest.TestCase):
     # https://docs.python.org/2/library/unittest.html
@@ -16,10 +15,9 @@ class TestTrack(unittest.TestCase):
 
     def setUp(self):
         T1 = Track()
-        T2 = Track()
-        fn_in = "./examples/data/T220.csv"
-        T1.load_from_csv(fn_in)
-        T2.load_from_csv(fn_in)
+        T2 = Track()        
+        T1.load_from_csv(track_data_path)
+        T2.load_from_csv(track_data_path)
         self.T1 = T1
         self.T2 = T2
         self.diff1 = (1.1, 1.2)
@@ -28,6 +26,13 @@ class TestTrack(unittest.TestCase):
         self.matrix_81 = self.vector_8.reshape((8, 1))
         self.matrix_28 = np.array(range(16)).reshape(2, 8)
         pass
+
+    def tearDown(self):
+        # removes generated files so they are not left in .git by accident
+        for f in os.listdir("test"):
+            if re.search(".*(.png)|(.mp4)", f):
+                os.remove(os.path.join("test", f))
+
 
     def test_move_x(self):
         oldx = self.T1.x.copy()
@@ -62,22 +67,16 @@ class TestTrack(unittest.TestCase):
     def test_generate_vonmises(self):
         #, position, speed, kappa, time=None, direction=None):
         self.T1.generate_vonmises(
-            Position().circular_positions(8, 5),
-            5.,
-            40)
-        self.T1.plot("test_generated.png")
-        self.T1.make_video("test_generated.mp4")
+            Position().circular_positions(8, 5), 5., 40)
+        self.T1.plot(os.path.join("test", "test_generated.png"))
+        self.T1.make_video(os.path.join("test", "test_generated.mp4"))
         self.assertTrue(True)
 
     def test_plot(self):
-        self.T1.plot("test_trajectory.png")
+        self.T1.plot(os.path.join("test", "test_trajectory.png"))
         self.assertTrue(True)
 
     @unittest.skipUnless(COMPLETE, "Time consuming video generation")
     def test_make_video(self):
-        self.T1.make_video("test_video.mp4")
+        self.T1.make_video(os.path.join("test", "test_video.mp4"))
         self.assertTrue(True)
-
-# if __name__ == '__main__':
-#     unittest.main()
-#
