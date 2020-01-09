@@ -1,79 +1,101 @@
 <?xml version="1.0" ?>
-<PsychoPy2experiment encoding="utf-8" version="1.90.2">
+<PsychoPy2experiment encoding="utf-8" version="1.90.3">
   <Settings>
+    <Param name="expName" updates="None" val="demo" valType="str"/>
+    <Param name="Show info dlg" updates="None" val="True" valType="bool"/>
+    <Param name="Enable Escape" updates="None" val="True" valType="bool"/>
+    <Param name="Experiment info" updates="None" val="{'session': '001', 'participant': ''}" valType="code"/>
+    <Param name="Use version" updates="None" val="" valType="str"/>
+    <Param name="Full-screen window" updates="None" val="True" valType="bool"/>
+    <Param name="Window size (pixels)" updates="None" val="[1920, 1080]" valType="code"/>
+    <Param name="Screen" updates="None" val="1" valType="num"/>
     <Param name="Monitor" updates="None" val="testMonitor" valType="str"/>
     <Param name="color" updates="None" val="$[0,0,0]" valType="str"/>
     <Param name="colorSpace" updates="None" val="rgb" valType="str"/>
-    <Param name="Experiment info" updates="None" val="{u'session': u'001', u'participant': u''}" valType="code"/>
-    <Param name="JS libs" updates="None" val="packaged" valType="str"/>
     <Param name="Units" updates="None" val="norm" valType="str"/>
-    <Param name="Save excel file" updates="None" val="False" valType="bool"/>
-    <Param name="Enable Escape" updates="None" val="True" valType="bool"/>
-    <Param name="Save psydat file" updates="None" val="True" valType="bool"/>
-    <Param name="Window size (pixels)" updates="None" val="[1920, 1080]" valType="code"/>
-    <Param name="Full-screen window" updates="None" val="True" valType="bool"/>
     <Param name="blendMode" updates="None" val="avg" valType="str"/>
-    <Param name="Use version" updates="None" val="" valType="str"/>
-    <Param name="HTML path" updates="None" val="html" valType="str"/>
-    <Param name="Save csv file" updates="None" val="False" valType="bool"/>
-    <Param name="OSF Project ID" updates="None" val="" valType="str"/>
-    <Param name="Save log file" updates="None" val="True" valType="bool"/>
-    <Param name="Save wide csv file" updates="None" val="True" valType="bool"/>
     <Param name="Show mouse" updates="None" val="False" valType="bool"/>
     <Param name="Data filename" updates="None" val="u'data/%s_%s_%s' % (expInfo['participant'], expName, expInfo['date'])" valType="code"/>
-    <Param name="Show info dlg" updates="None" val="True" valType="bool"/>
-    <Param name="expName" updates="None" val="demo" valType="str"/>
+    <Param name="Save log file" updates="None" val="True" valType="bool"/>
+    <Param name="Save wide csv file" updates="None" val="True" valType="bool"/>
+    <Param name="Save csv file" updates="None" val="False" valType="bool"/>
+    <Param name="Save excel file" updates="None" val="False" valType="bool"/>
+    <Param name="Save psydat file" updates="None" val="True" valType="bool"/>
     <Param name="logging level" updates="None" val="exp" valType="code"/>
-    <Param name="Screen" updates="None" val="1" valType="num"/>
+    <Param name="OSF Project ID" updates="None" val="" valType="str"/>
+    <Param name="HTML path" updates="None" val="html" valType="str"/>
+    <Param name="JS libs" updates="None" val="packaged" valType="str"/>
   </Settings>
   <Routines>
     <Routine name="trial">
       <CodeComponent name="code">
-        <Param name="Begin Experiment" updates="constant" val="sys.path.insert(0, '..', '..') # to load module from neighbouring folder&amp;#10;import motbox as pymot&amp;#10;&amp;#10;track_filename = &quot;../examples/data/T220.csv&quot;&amp;#10;&amp;#10;" valType="extendedCode"/>
         <Param name="name" updates="None" val="code" valType="code"/>
+        <Param name="Begin Experiment" updates="constant" val="sys.path.insert(0, os.path.join('..', '..')) # to load module from neighbouring folder&amp;#10;import motbox as pymot&amp;#10;&amp;#10;track_filename = os.path.join('tracks', 'T220.csv')&amp;#10;" valType="extendedCode"/>
         <Param name="Begin Routine" updates="constant" val="T = pymot.Track()&amp;#10;T.load_from_csv(track_filename)&amp;#10;T.scale(30) # px per inch&amp;#10;&amp;#10;P = pymot.Puppeteer()&amp;#10;P.track = T&amp;#10;P.clone_template_psychopy(p1_template, 4)&amp;#10;&amp;#10;" valType="extendedCode"/>
+        <Param name="Each Frame" updates="constant" val="stop_time = 4&amp;#10;if t &gt;= 0 and t &lt;= stop_time:&amp;#10;    map(lambda x: x.setAutoDraw(True), P.objects)&amp;#10;    P.update_positions_psychopy(t)&amp;#10;&amp;#10;if t &gt; stop_time and t &lt;= (stop_time + 1):&amp;#10;    map(lambda x: x.setAutoDraw(True), P.objects)&amp;#10;    P.update_positions_psychopy(4)&amp;#10;&amp;#10;if t &gt; (stop_time + 1):&amp;#10;    map(lambda x: x.setAutoDraw(False), P.objects)&amp;#10;" valType="extendedCode"/>
         <Param name="End Routine" updates="constant" val="" valType="extendedCode"/>
         <Param name="End Experiment" updates="constant" val="" valType="extendedCode"/>
-        <Param name="Each Frame" updates="constant" val="stop_time = 4&amp;#10;if t &gt;= 0 and t &lt;= stop_time:&amp;#10;    map(lambda x: x.setAutoDraw(True), P.objects)&amp;#10;    P.update_positions_psychopy(t)&amp;#10;&amp;#10;if t &gt; stop_time and t &lt;= (stop_time + 1):&amp;#10;    map(lambda x: x.setAutoDraw(True), P.objects)&amp;#10;    P.update_positions_psychopy(4)&amp;#10;&amp;#10;if t &gt; (stop_time + 1):&amp;#10;    map(lambda x: x.setAutoDraw(False), P.objects)&amp;#10;" valType="extendedCode"/>
       </CodeComponent>
-      <ImageComponent name="p1_template">
-        <Param name="opacity" updates="constant" val="1" valType="code"/>
-        <Param name="flipVert" updates="constant" val="False" valType="bool"/>
-        <Param name="colorSpace" updates="constant" val="rgb" valType="str"/>
-        <Param name="flipHoriz" updates="constant" val="False" valType="bool"/>
-        <Param name="name" updates="None" val="p1_template" valType="code"/>
-        <Param name="color" updates="constant" val="$[1,1,1]" valType="str"/>
-        <Param name="stopVal" updates="constant" val="1.0" valType="code"/>
-        <Param name="durationEstim" updates="None" val="" valType="code"/>
-        <Param name="mask" updates="constant" val="None" valType="str"/>
-        <Param name="pos" updates="constant" val="(10000, 10000)" valType="code"/>
-        <Param name="interpolate" updates="constant" val="linear" valType="str"/>
-        <Param name="startEstim" updates="None" val="" valType="code"/>
-        <Param name="units" updates="None" val="pix" valType="str"/>
-        <Param name="texture resolution" updates="constant" val="128" valType="code"/>
+      <ImageComponent name="p2_template">
+        <Param name="name" updates="None" val="p2_template" valType="code"/>
         <Param name="startType" updates="None" val="time (s)" valType="str"/>
-        <Param name="ori" updates="constant" val="0" valType="code"/>
         <Param name="stopType" updates="None" val="duration (s)" valType="str"/>
         <Param name="startVal" updates="None" val="0.0" valType="code"/>
-        <Param name="image" updates="constant" val="img/happy-50-green.png" valType="str"/>
+        <Param name="stopVal" updates="constant" val="1.0" valType="code"/>
+        <Param name="startEstim" updates="None" val="" valType="code"/>
+        <Param name="durationEstim" updates="None" val="" valType="code"/>
+        <Param name="units" updates="None" val="pix" valType="str"/>
+        <Param name="color" updates="constant" val="$[1,1,1]" valType="str"/>
+        <Param name="opacity" updates="constant" val="1" valType="code"/>
+        <Param name="colorSpace" updates="constant" val="rgb" valType="str"/>
+        <Param name="pos" updates="constant" val="(10000, 10000)" valType="code"/>
         <Param name="size" updates="constant" val="(64, 64)" valType="code"/>
+        <Param name="ori" updates="constant" val="0" valType="code"/>
+        <Param name="image" updates="constant" val="img/happy-50-green.png" valType="str"/>
+        <Param name="mask" updates="constant" val="None" valType="str"/>
+        <Param name="texture resolution" updates="constant" val="128" valType="code"/>
+        <Param name="interpolate" updates="constant" val="linear" valType="str"/>
+        <Param name="flipVert" updates="constant" val="False" valType="bool"/>
+        <Param name="flipHoriz" updates="constant" val="False" valType="bool"/>
       </ImageComponent>
       <KeyboardComponent name="key_resp_2">
-        <Param name="correctAns" updates="constant" val="" valType="str"/>
-        <Param name="storeCorrect" updates="constant" val="False" valType="bool"/>
         <Param name="name" updates="None" val="key_resp_2" valType="code"/>
-        <Param name="stopVal" updates="constant" val="5" valType="code"/>
-        <Param name="durationEstim" updates="None" val="" valType="code"/>
-        <Param name="forceEndRoutine" updates="constant" val="True" valType="bool"/>
-        <Param name="startEstim" updates="None" val="" valType="code"/>
-        <Param name="discard previous" updates="constant" val="True" valType="bool"/>
         <Param name="startType" updates="None" val="time (s)" valType="str"/>
-        <Param name="allowedKeys" updates="constant" val="'space'" valType="code"/>
         <Param name="stopType" updates="None" val="duration (s)" valType="str"/>
         <Param name="startVal" updates="None" val="0.5" valType="code"/>
+        <Param name="stopVal" updates="constant" val="5" valType="code"/>
+        <Param name="startEstim" updates="None" val="" valType="code"/>
+        <Param name="durationEstim" updates="None" val="" valType="code"/>
+        <Param name="allowedKeys" updates="constant" val="'space'" valType="code"/>
+        <Param name="discard previous" updates="constant" val="True" valType="bool"/>
         <Param name="store" updates="constant" val="nothing" valType="str"/>
+        <Param name="forceEndRoutine" updates="constant" val="True" valType="bool"/>
+        <Param name="storeCorrect" updates="constant" val="False" valType="bool"/>
+        <Param name="correctAns" updates="constant" val="" valType="str"/>
         <Param name="syncScreenRefresh" updates="constant" val="True" valType="bool"/>
       </KeyboardComponent>
+      <PolygonComponent name="p1_template">
+        <Param name="name" updates="None" val="p1_template" valType="code"/>
+        <Param name="startType" updates="None" val="time (s)" valType="str"/>
+        <Param name="stopType" updates="None" val="duration (s)" valType="str"/>
+        <Param name="startVal" updates="None" val="0.0" valType="code"/>
+        <Param name="stopVal" updates="constant" val="5" valType="code"/>
+        <Param name="startEstim" updates="None" val="" valType="code"/>
+        <Param name="durationEstim" updates="None" val="" valType="code"/>
+        <Param name="units" updates="None" val="from exp settings" valType="str"/>
+        <Param name="opacity" updates="constant" val="1" valType="code"/>
+        <Param name="pos" updates="constant" val="(0, 0)" valType="code"/>
+        <Param name="size" updates="constant" val="(0.5, 0.5)" valType="code"/>
+        <Param name="ori" updates="constant" val="0" valType="code"/>
+        <Param name="nVertices" updates="constant" val="4" valType="int"/>
+        <Param name="shape" updates="constant" val="rectangle" valType="str"/>
+        <Param name="fillColorSpace" updates="constant" val="rgb" valType="str"/>
+        <Param name="fillColor" updates="constant" val="$[1,1,1]" valType="str"/>
+        <Param name="lineColorSpace" updates="constant" val="rgb" valType="str"/>
+        <Param name="lineColor" updates="constant" val="$[1,1,1]" valType="str"/>
+        <Param name="lineWidth" updates="constant" val="1" valType="code"/>
+        <Param name="interpolate" updates="constant" val="linear" valType="str"/>
+      </PolygonComponent>
     </Routine>
   </Routines>
   <Flow>
