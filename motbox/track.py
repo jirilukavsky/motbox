@@ -29,6 +29,7 @@ class Position(object):
         else:
             self.n_objects = len(x)
 
+
     def is_min_distance_complied(self, min_distance):
         """Checks if objects' distances are smaller than specified value
         """
@@ -117,6 +118,14 @@ class Track(object):
         self.n_objects = 0
 
 
+    def load_from_csv(self, filename):
+        """Initializes object from data file.
+
+        Calls classic format. Maybe add format detection in future.
+        """
+        return self.load_from_csv_v0(filename)
+
+
     def load_from_csv_v0(self, filename):
         """Initializes object from data file.
         Uses format from RepMot/RevMot studies.
@@ -202,14 +211,6 @@ class Track(object):
             newx[:, index] = np.interp(timevalue, self.time, self.x[:, index])
             newy[:, index] = np.interp(timevalue, self.time, self.y[:, index])
         return (newx, newy)
-
-
-    def load_from_csv(self, filename):
-        """Initializes object from data file.
-
-        Calls classic format. Maybe add format detection in future.
-        """
-        return self.load_from_csv_v0(filename)
 
 
     def save_to_csv(self, filename):
