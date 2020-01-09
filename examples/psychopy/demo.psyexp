@@ -29,7 +29,7 @@
   <Routines>
     <Routine name="trial">
       <CodeComponent name="code">
-        <Param name="Begin Experiment" updates="constant" val="sys.path.insert(0, '..') # to load module from neighbouring folder&amp;#10;import motbox as pymot&amp;#10;&amp;#10;track_filename = &quot;../examples/data/T220.csv&quot;&amp;#10;&amp;#10;" valType="extendedCode"/>
+        <Param name="Begin Experiment" updates="constant" val="sys.path.insert(0, '..', '..') # to load module from neighbouring folder&amp;#10;import motbox as pymot&amp;#10;&amp;#10;track_filename = &quot;../examples/data/T220.csv&quot;&amp;#10;&amp;#10;" valType="extendedCode"/>
         <Param name="name" updates="None" val="code" valType="code"/>
         <Param name="Begin Routine" updates="constant" val="T = pymot.Track()&amp;#10;T.load_from_csv(track_filename)&amp;#10;T.scale(30) # px per inch&amp;#10;&amp;#10;P = pymot.Puppeteer()&amp;#10;P.track = T&amp;#10;P.clone_template_psychopy(p1_template, 4)&amp;#10;&amp;#10;" valType="extendedCode"/>
         <Param name="End Routine" updates="constant" val="" valType="extendedCode"/>

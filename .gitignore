@@ -105,12 +105,13 @@ venv.bak/
 
 tmp/
 
-demo/data/
+## Example files
+examples/psychopy/data/
+examples/psychopy/demo_lastrun.py
+examples/*.mp4
+examples/*.png
 
-demo/demo_lastrun.py
-test_generated.mp4
-test_generated.png
-test_video.mp4
-test_generated.png
-demo_kappa.mp4
-demo_kappa.png
+## exceptions from general ommision of png and mp4
+!examples/test_generated.png
+!examples/test_trajectory.png
+!examples/psychopy/img/*.png
