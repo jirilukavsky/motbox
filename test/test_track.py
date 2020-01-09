@@ -1,9 +1,14 @@
+"""Unittests for t
+"""
+
 import unittest
 import numpy as np
 from numpy import testing
-from motbox import *
+from motbox import Track, Position
+
 
 COMPLETE = False
+
 
 class TestTrack(unittest.TestCase):
     # https://docs.python.org/2/library/unittest.html
