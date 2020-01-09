@@ -21,6 +21,9 @@ setuptools.setup(
     install_requires=[
       'numpy>=1.16',
       'Click>=7.0',
+      'moviepy',
+      'matplotlib',
+      'scipy'
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
