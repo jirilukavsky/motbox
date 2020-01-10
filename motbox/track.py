@@ -146,6 +146,14 @@ class Track(object):
         pass
 
 
+    def save_to_csv(self, filename):
+        """Saves object's data to file
+
+        Defaults to classic format.
+        """
+        return self.save_to_csv_v0(filename)
+
+
     def save_to_csv_v0(self, filename):
         """Saves object's data to file
 
@@ -203,6 +211,15 @@ class Track(object):
 
     def position_for_time(self, timevalue):
         """Interpolates coordinates for given time point
+
+        Parameters
+        ---------
+          timevalue : float
+            time at which to interpolate the position
+
+        Returns
+        ---------
+          touple (x, y) of arrays for interpolated positions at time
         """
         n_objects = self.n_objects
         newx = np.zeros((1, n_objects))
@@ -211,14 +228,6 @@ class Track(object):
             newx[:, index] = np.interp(timevalue, self.time, self.x[:, index])
             newy[:, index] = np.interp(timevalue, self.time, self.y[:, index])
         return (newx, newy)
-
-
-    def save_to_csv(self, filename):
-        """Saves object's data to file
-
-        Defaults to classic format.
-        """
-        return self.save_to_csv_v0(filename)
 
 
     def summary(self):
@@ -232,7 +241,19 @@ class Track(object):
 
 
     def plot(self, filename, xlim=(-10, 10), ylim=(-10, 10)):
-        """Plots trajectories into a file
+        """Plots trajectories into a file. Uses matplotlib
+
+        Parameters
+        -----------
+          filename: str
+            filename for the plot o be saved into
+          xlim: touple of float 
+            x plot limits
+          ylim : touple of float
+
+        Returns
+        -------
+          Saves a png file of name filename into the working directory
         """
         plt.figure()
         plt.plot(self.x, self.y, "k")
@@ -242,7 +263,26 @@ class Track(object):
         plt.ylim(ylim)
         plt.savefig(filename)
 
+
     def make_video(self, filename, xlim=(-10, 10), ylim=(-10, 10), callback=None, axisOff=True):
+      """Create video of the track and saves it in working directory
+
+      Parameters
+      ---------
+        filename : string 
+          name of the file to be saved into
+        xlim : touple(2) of float
+          xlimits of the fideo
+        ylim : touple(2) of float
+          ylimits of the video
+        callback:
+          what to 
+        axisOff : bool
+
+      Returns
+      --------
+      saved mp4 video at fiven filepath
+      """
         WIDTH = 900
         HEIGHT = 600
         DPI = 150
@@ -270,6 +310,19 @@ class Track(object):
 
     def bounce_square(self, position, direction, arena_opts):
         """Checks for boundary bouncing and returns corrected directions
+
+        Parameters
+        ----------
+          position : object of class motbox.Position
+
+          direction : 
+
+
+          arena_opts : dictionary
+            DESCRIPTION
+
+        Returns
+
         """
         xlim = arena_opts["xlim"]
         ylim = arena_opts["ylim"]
