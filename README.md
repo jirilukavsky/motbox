@@ -15,3 +15,5 @@ Use `pylint motbox/*.py` or `pylint motbox/yourfile.py`
 ## Unit tests
 
 Use `python -m unittest discover test` at top folder level.
+
+Running a single test is also possible `python -m unittest test.test_track.TestTrack.test_generate_vonmises.` But beware that the test file includes COMPLETE parameter which by defaults skips those functionw which take a long time to finish (video or track generations).

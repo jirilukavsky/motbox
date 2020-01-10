@@ -283,29 +283,29 @@ class Track(object):
       --------
       saved mp4 video at fiven filepath
       """
-        WIDTH = 900
-        HEIGHT = 600
-        DPI = 150
-        FPS = 25
-        DURATION = np.max(self.time) - np.min(self.time)
+      WIDTH = 900
+      HEIGHT = 600
+      DPI = 150
+      FPS = 25
+      DURATION = np.max(self.time) - np.min(self.time)
 
-        fig, axis = plt.subplots(figsize=(1.0 * WIDTH / DPI, 1.0 * HEIGHT / DPI), dpi=DPI)
-        def make_frame(t):
-            axis.clear()
-            (tx, ty) = self.position_for_time(t + np.min(self.time))
-            axis.plot(tx, ty, "ko")
-            axis.set_xlim(xlim)
-            axis.set_ylim(ylim)
-            axis.set_title("Time {:.2f} s".format(t))
-            if not callback is None:
-                callback(axis)
-            if axisOff:
-                plt.axis('off')
-            return mplfig_to_npimage(fig)
-        animation = VideoClip(make_frame, duration=DURATION)
-        #animation.write_gif(filename, fps=FPS)
-        animation.write_videofile(filename, fps=FPS)
-        pass
+      fig, axis = plt.subplots(figsize=(1.0 * WIDTH / DPI, 1.0 * HEIGHT / DPI), dpi=DPI)
+      def make_frame(t):
+          axis.clear()
+          (tx, ty) = self.position_for_time(t + np.min(self.time))
+          axis.plot(tx, ty, "ko")
+          axis.set_xlim(xlim)
+          axis.set_ylim(ylim)
+          axis.set_title("Time {:.2f} s".format(t))
+          if not callback is None:
+              callback(axis)
+          if axisOff:
+              plt.axis('off')
+          return mplfig_to_npimage(fig)
+      animation = VideoClip(make_frame, duration=DURATION)
+      #animation.write_gif(filename, fps=FPS)
+      animation.write_videofile(filename, fps=FPS)
+      pass
 
 
     def bounce_square(self, position, direction, arena_opts):
@@ -358,43 +358,87 @@ class Track(object):
         return direction
 
 
-    def generate_vonmises(self, position, speed, kappa, opts,
-                          time=None, direction=None):
+    def generate_trajectory(self, position, speed, opts, time = None, direction = None, jitter_func = None):
+      """Generates trajectory for given position, speed and 
+
+      Parameters
+      ---------
+      position : object of class motbox.Position
+        defines original starting points and number of objects. See `Position.random_position` for a generator of random startup
+      speed :
+      opts : dictionary with optional parameters
+        currently allowed parameters are xlim, ylim, spacing. e.g. opts = {"xlim": (-10, 10), "ylim": (-10, 10), "spacing":2.}
+      time : touple of float
+        array of floats to generate . e.g. range(0, 5, 0.1) for a 5s long track generated each 0.1 s. 
+      direction : touple of float, optional
+        defines starting direction of movement for all objects. The angle is in radians (0-2pi). (default is None, generates randomly). 
+      jitter_func : function to add jitter
+        function to add jitter to otherwise straigth path.
+
+      Returns
+      ---------
+      Returns self with generated track
+      
+      """
+      if not time is None:
+          self.time = time
+      timestep = self.timestep()
+      n = position.n_objects
+      # Check for the correct size of direction
+      if direction is None:
+          direction = np.random.uniform(low=0., high=2*np.pi, size=(n,))
+      self.x = np.zeros((len(self.time), n))
+      self.y = np.zeros((len(self.time), n))
+      self.n_objects = n
+      step = speed * timestep
+      self.x[0, :] = position.x
+      self.y[0, :] = position.y
+      for frame in range(1, len(self.time)):
+          # check boundary
+          direction_old = direction.copy()
+          direction = self.bounce_square(position, direction, opts)
+          # check collisions
+          direction_old = direction.copy()
+          direction = self.bounce_objects(position, direction, opts)
+
+          position.move((np.sin(direction) * step, np.cos(direction) * step))
+
+          tx = self.x[frame - 1, :] + np.sin(direction) * step
+          ty = self.y[frame - 1, :] + np.cos(direction) * step
+
+          # store coordinates
+          self.x[frame, :] = tx
+          self.y[frame, :] = ty
+          # update direction
+          if jitter_func is not None:
+            direction += jitter_func()
+      return self
+
+    def generate_vonmises(self, position, speed, kappa, opts, time=None, direction=None):
         """Generates trajectories from starting positions and von Mises sampling
+
+        Parameters
+        ----------
+        position:
+        speed : 
+        kappa : 
+        opts : 
+        time : 
+
+        Return
+        ---------
+        self with generated tracjectories
+        Ses Also
+        --------- 
+        Track.generate_trajectory
         """
         # opt = {"xlim": (-10, 10), "ylim": (-10, 10), "spacing":2.}
-        if not time is None:
-            self.time = time
-        timestep = self.timestep()
+
         n = position.n_objects
-        if direction is None:
-            direction = np.random.uniform(low=0., high=2*np.pi, size=(n,))
-        self.x = np.zeros((len(self.time), n))
-        self.y = np.zeros((len(self.time), n))
-        self.n_objects = n
-        step = speed * timestep
-        self.x[0, :] = position.x
-        self.y[0, :] = position.y
-        for frame in range(1, len(self.time)):
-            # check boundary
-            direction_old = direction.copy()
-            direction = self.bounce_square(position, direction, opts)
-            # check collisions
-            direction_old = direction.copy()
-            direction = self.bounce_objects(position, direction, opts)
-
-            position.move((np.sin(direction) * step, np.cos(direction) * step))
-
-            tx = self.x[frame - 1, :] + np.sin(direction) * step
-            ty = self.y[frame - 1, :] + np.cos(direction) * step
-
-            # store coordinates
-            self.x[frame, :] = tx
-            self.y[frame, :] = ty
-            # update direction
-            direction += np.random.vonmises(mu=0, kappa=kappa, size=direction.shape)
-        return self
-
+        def jitter_func():
+            return np.random.vonmises(mu=0, kappa=kappa, size=n)
+        return self.generate_trajectory(position, speed, opts, time, direction, jitter_func)
+        
 
 if __name__ == "__main__":
     # execute only if run as a script
