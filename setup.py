@@ -22,7 +22,8 @@ setuptools.setup(
       'numpy>=1.16',
       'moviepy',
       'matplotlib',
-      'scipy'
+      'scipy',
+      'click'
     ],
     classifiers=[
         "Programming Language :: Python :: 3",
