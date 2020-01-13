@@ -378,6 +378,7 @@ class Track(object):
         return direction
 
 
+    # TODO - redo the opts parameter, as it includes REQUIRED parameters (such as spacing), so it is not much optional
     def generate_trajectory(self, position, speed, opts, time = None, direction = None, jitter_func = None):
       """Generates trajectory for given position, speed and 
 
@@ -385,11 +386,12 @@ class Track(object):
       ---------
       position : object of class motbox.Position
         defines original starting points and number of objects. See `Position.random_position` for a generator of random startup
-      speed :
+      speed : float
+        how far will the object move each "tick". Dependent on the length of the time parameter.
       opts : dictionary with optional parameters
         currently allowed parameters are xlim, ylim, spacing. e.g. opts = {"xlim": (-10, 10), "ylim": (-10, 10), "spacing":2.}
       time : touple of float
-        array of floats to generate . e.g. range(0, 5, 0.1) for a 5s long track generated each 0.1 s. 
+        array of floats to generate . e.g. np.arange(0, 5, 0.1) for a 5s long track generated each 0.1 s. 
       direction : touple of float, optional
         defines starting direction of movement for all objects. The angle is in radians (0-2pi). (default is None, generates randomly). 
       jitter_func : function to add jitter
@@ -398,8 +400,9 @@ class Track(object):
       Returns
       ---------
       Returns self with generated track
-      
       """
+      # TODO - allow time to be passed as a number and np.arrange is run from within the function
+      # TODO - handle time is being none - it crashes
       if not time is None:
           self.time = time
       timestep = self.timestep()
