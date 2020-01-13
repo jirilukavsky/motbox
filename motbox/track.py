@@ -40,16 +40,36 @@ class Position(object):
         return np.all(dist > min_distance)
 
 
+    # TODO - potentially make this static?
     def random_positions(self, n, xlim, ylim, min_distance):
         """Populates square ares (xlim x ylim) with n objects.
         Checks minimum inter-object distance
+
+        Parameters
+        ---------
+          n : int
+            number of points to simulate
+          xlim : touple of floats (2)
+            definition of lower and upper limit of x positions
+          ylim : touple of floats (2)
+            definition of lower and upper limit of y positions
+        
+        Returns
+        -------
+        Position
+          Position object with randomly generated positions for n points
+        
+        Examples
+        -------
+        position = Position()
+        position.random_positions(5, (-10,10), (-10,10), 1)
         """
         while True:
             self.n_objects = n
             self.x = np.random.uniform(low=xlim[0], high=xlim[1], size=(n, ))
             self.y = np.random.uniform(low=ylim[0], high=ylim[1], size=(n, ))
             if self.is_min_distance_complied(min_distance):
-                break
+              break
         return self
 
 
@@ -413,6 +433,7 @@ class Track(object):
           if jitter_func is not None:
             direction += jitter_func()
       return self
+
 
     def generate_vonmises(self, position, speed, kappa, opts, time=None, direction=None):
         """Generates trajectories from starting positions and von Mises sampling
