@@ -386,11 +386,12 @@ class Track(object):
       ---------
       position : object of class motbox.Position
         defines original starting points and number of objects. See `Position.random_position` for a generator of random startup
-      speed : float
-        how far will the object move each "tick". Dependent on the length of the time parameter.
+      speed : float or tuple
+        how far will the object move each "tick". Dependent on the length of the time parameter. If touple, it needs to have the same length as
+        is the number of positions. Allows separate speeds to be applied to each object. e.g. (speed for first object, speed for second, etc.)
       opts : dictionary with optional parameters
         currently allowed parameters are xlim, ylim, spacing. e.g. opts = {"xlim": (-10, 10), "ylim": (-10, 10), "spacing":2.}
-      time : touple of float
+      time : tuple of float
         array of floats to generate . e.g. np.arange(0, 5, 0.1) for a 5s long track generated each 0.1 s. 
       direction : touple of float, optional
         defines starting direction of movement for all objects. The angle is in radians (0-2pi). (default is None, generates randomly). 
@@ -401,21 +402,22 @@ class Track(object):
       ---------
       Returns self with generated track
       """
+      if type(speed) is tuple and len(speed) != position.n_objects:
+        raise Exception("Length of speed is not the same as number of objects")
+      
+      self.n_objects = position.n_objects
       # TODO - allow time to be passed as a number and np.arrange is run from within the function
       # TODO - handle time is being none - it crashes
       if not time is None:
           self.time = time
-      timestep = self.timestep()
-      n = position.n_objects
-      # Check for the correct size of direction
       if direction is None:
-          direction = np.random.uniform(low=0., high=2*np.pi, size=(n,))
-      self.x = np.zeros((len(self.time), n))
-      self.y = np.zeros((len(self.time), n))
-      self.n_objects = n
-      step = speed * timestep
+          direction = np.random.uniform(low=0., high=2*np.pi, size=(self.n_objects,))
+      
+      self.x = np.zeros((len(self.time), self.n_objects))
+      self.y = np.zeros((len(self.time), self.n_objects))
       self.x[0, :] = position.x
       self.y[0, :] = position.y
+      step = np.asarray(speed) * self.timestep()
       for frame in range(1, len(self.time)):
           # check boundary
           direction_old = direction.copy()
@@ -425,7 +427,8 @@ class Track(object):
           direction = self.bounce_objects(position, direction, opts)
 
           position.move((np.sin(direction) * step, np.cos(direction) * step))
-
+          
+          #take information from the just calculated position
           tx = self.x[frame - 1, :] + np.sin(direction) * step
           ty = self.y[frame - 1, :] + np.cos(direction) * step
 
