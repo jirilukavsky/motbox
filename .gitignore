@@ -105,6 +105,9 @@ venv.bak/
 
 tmp/
 
+## VSCODE
+.vscode/
+
 ## Example files
 examples/psychopy/data/
 examples/psychopy/demo_lastrun.py
