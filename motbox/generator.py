@@ -37,8 +37,7 @@ def generate_straight_trajectory(path, filename='track', n=1, speed=1, time=5, f
 	---------
 	This function is basically just a wrapper around motbox.Track.generate_tracjectory
 	"""
-	dirpath = os.path.dirname(os.path.realpath(path))
-	filepath = os.path.join(dirpath, filename)
+	filepath = os.path.join(path, filename)
 	## generate random start
 	position = Position()
 	position.random_positions(n, xlim, ylim, 1)
@@ -46,7 +45,6 @@ def generate_straight_trajectory(path, filename='track', n=1, speed=1, time=5, f
 	## generate path
 	track = Track()
 	track.generate_trajectory(position, speed, {"xlim": xlim, "ylim": ylim, "spacing": 1}, time = np.arange(0, time, 1/frequency))
-	print(f'saving to {filepath}.csv')
 	track.save_to_csv(f'{filepath}.csv')
 
 	## generate image and video

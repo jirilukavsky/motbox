@@ -3,7 +3,7 @@ import click
 from motbox.generator import generate_straight_trajectory as gst
 
 @click.command()
-@click.argument('path', type=click.Path(exists=True))
+@click.argument('path', type=click.Path(exists=True, dir_okay=True, file_okay=False))
 @click.option('-f', '--filename', default='track', type=str)
 @click.option('-n', '--n', default=1, type=int)
 @click.option('-s', '--speed', default=1, type=float)
@@ -14,5 +14,6 @@ from motbox.generator import generate_straight_trajectory as gst
 @click.option('--plot', default=False, type=bool)
 @click.option('--video', default=False, type=bool)
 def generate_straight_trajectory(path, filename, n, speed, time, frequency, xlim, ylim, plot, video):
-  gst(path, filename, n, speed, time, frequency, xlim, ylim, plot, video)
-  
+	filepath = os.path.join(path, filename)
+	click.echo(f'Saving to {filepath}.csv')
+	gst(path, filename, n, speed, time, frequency, xlim, ylim, plot, video)
