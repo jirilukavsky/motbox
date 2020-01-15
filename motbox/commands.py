@@ -16,4 +16,5 @@ from motbox.generator import generate_straight_trajectory as gst
 def generate_straight_trajectory(path, filename, n, speed, time, frequency, xlim, ylim, plot, video):
 	filepath = os.path.join(path, filename)
 	click.echo(f'Saving to {filepath}.csv')
-	gst(path, filename, n, speed, time, frequency, xlim, ylim, plot, video)
+	gst(n=n, speed=speed, time=time, frequency=frequency,
+    xlim=xlim, ylim=ylim, save=True, path=path, filename=filename, plot=plot, video=video)

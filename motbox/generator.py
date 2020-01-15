@@ -3,14 +3,12 @@ import numpy as np
 from motbox import Track, Position
 
 
-def generate_straight_trajectory(path, filename='track', n=1, speed=1, time=5, frequency=10, xlim=(-10,10), ylim=(-10,10), plot=False, video=False):
+def generate_straight_trajectory(n=1, speed=1, time=5, frequency=10, xlim=(-10,10), ylim=(-10,10), save=True, path='.', filename='track', plot=False, video=False):
 	"""Generates straight trajectory at random starting points.
-	Saves trajectory as a csv, and then saves a plot and video if wanted
+	returns the trajectory as a csv, and then saves a plot and video if wanted
 
 	Parameters
 	----------
-	filename : str ('track')
-		name of the file to be prepended to csv, plot and video files
 	n : int
 		number of objects to be moved
 	speed : float or tuple of floats
@@ -24,10 +22,14 @@ def generate_straight_trajectory(path, filename='track', n=1, speed=1, time=5, f
 		limits of the box in which the objects move
 	ylim : tuple of floats (-10, 10)
 		limits of the box in which the objects move 
+  save : bool (True)
+    should the trajectory be saved as a csv? path and filename should be provided to override the default
+	filename : str ('track')
+		name of the file to be prepended to csv, plot and video files
 	plot : bool (False)
-		if the plot of the trajectory should be created
+		if the plot of the trajectory should be created. filename is used to determine name of the plot
 	video : bool (False)
-		if the video of the trajectory should be created
+		if the video of the trajectory should be created. filename is used to create name of the video
 
 	Return
 	--------
@@ -45,9 +47,9 @@ def generate_straight_trajectory(path, filename='track', n=1, speed=1, time=5, f
 	## generate path
 	track = Track()
 	track.generate_trajectory(position, speed, {"xlim": xlim, "ylim": ylim, "spacing": 1}, time = np.arange(0, time, 1/frequency))
-	track.save_to_csv(f'{filepath}.csv')
-
-	## generate image and video
+	if save: track.save_to_csv(f'{filepath}.csv')
 	if plot: track.plot(f"{filepath}.png", xlim, ylim)
 	if video: track.make_video(f"{filepath}.mp4", xlim, ylim)
+  
+  return track
  
