@@ -7,7 +7,7 @@ from numpy import testing
 from motbox import Track, Position
 
 COMPLETE = False
-track_data_path = os.path.join("test", "tracks", "T220.csv")
+track_data_path = os.path.join("test", "tracks", "T220c.csv")
 
 class TestTrack(unittest.TestCase):
     # https://docs.python.org/2/library/unittest.html
@@ -16,8 +16,8 @@ class TestTrack(unittest.TestCase):
     def setUp(self):
         T1 = Track()
         T2 = Track()        
-        T1.load_from_csv(track_data_path)
-        T2.load_from_csv(track_data_path)
+        T1.load_from_csv(track_data_path, delimiter=",")
+        T2.load_from_csv(track_data_path, delimiter=",")
         self.T1 = T1
         self.T2 = T2
         self.diff1 = (1.1, 1.2)
