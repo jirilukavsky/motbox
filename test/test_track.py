@@ -63,20 +63,3 @@ class TestTrack(unittest.TestCase):
         step = self.T1.timestep()
         self.assertAlmostEqual(step, 0.01)
 
-    @unittest.skipUnless(COMPLETE, "Time consuming video generation")
-    def test_generate_vonmises(self):
-        #, position, speed, kappa, time=None, direction=None):
-        self.T1.generate_vonmises(
-            Position().circular_positions(8, 5), 5., 40)
-        self.T1.plot(os.path.join("test", "test_generated.png"))
-        self.T1.make_video(os.path.join("test", "test_generated.mp4"))
-        self.assertTrue(True)
-
-    def test_plot(self):
-        self.T1.plot(os.path.join("test", "test_trajectory.png"))
-        self.assertTrue(True)
-
-    @unittest.skipUnless(COMPLETE, "Time consuming video generation")
-    def test_make_video(self):
-        self.T1.make_video(os.path.join("test", "test_video.mp4"))
-        self.assertTrue(True)

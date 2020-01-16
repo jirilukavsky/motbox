@@ -6,7 +6,7 @@ Python code for preparing and presenting [Multiple Object Tracking](http://www.s
 
 Look inside the `examples` folder for an example of [PsychoPy](https://www.psychopy.org/) integration.
 
-Currently the package is tested and working with pscyhopy 1.9 and Python 2.
+Currently the package is tested and working with psychopy 1.9 and Python 2.
 
 ## Code
 
