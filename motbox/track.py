@@ -10,8 +10,10 @@ from scipy.spatial import distance
 from scipy.sparse import csgraph
 import matplotlib.pyplot as plt
 
+
 from moviepy.editor import VideoClip
 from moviepy.video.io.bindings import mplfig_to_npimage
+
 
 class Position(object):
     """Represents position of n objects or one timeslice of Track
@@ -27,6 +29,7 @@ class Position(object):
         else:
             self.n_objects = len(x)
 
+
     def is_min_distance_complied(self, min_distance):
         """Checks if objects' distances are smaller than specified value
         """
@@ -35,6 +38,7 @@ class Position(object):
         coords[:, 1] = self.y
         dist = distance.pdist(coords)
         return np.all(dist > min_distance)
+
 
     def random_positions(self, n, xlim, ylim, min_distance):
         """Populates square ares (xlim x ylim) with n objects.
@@ -48,6 +52,7 @@ class Position(object):
                 break
         return self
 
+
     def circular_positions(self, n, radius, center=(0, 0)):
         """Put n objects on a circle with given center and diameter
         """
@@ -57,6 +62,7 @@ class Position(object):
         self.n_objects = n
         return self
 
+
     def move(self, difference):
         """Shifts all x,y by constant.
 
@@ -65,12 +71,14 @@ class Position(object):
         self.x += difference[0]
         self.y += difference[1]
 
+
     def scale(self, factor):
         """Multiplies all x,y by constant
 
         """
         self.x *= factor
         self.y *= factor
+
 
     def jitter_positions(self, amount, method="normal"):
         """Adds uniform or normal jitter to existing positions
@@ -80,6 +88,7 @@ class Position(object):
         if method in ["uniform"]:
             jitter = np.random.uniform(low=-amount, high=amount, size=(2, self.n_objects))
         self.move((jitter[0, :], jitter[1, :]))
+
 
     def plot(self, filename, xlim=(-10, 10), ylim=(-10, 10)):
         """Plots positions into file
@@ -109,6 +118,14 @@ class Track(object):
         self.n_objects = 0
 
 
+    def load_from_csv(self, filename):
+        """Initializes object from data file.
+
+        Calls classic format. Maybe add format detection in future.
+        """
+        return self.load_from_csv_v0(filename)
+
+
     def load_from_csv_v0(self, filename):
         """Initializes object from data file.
         Uses format from RepMot/RevMot studies.
@@ -128,6 +145,7 @@ class Track(object):
             pass
         pass
 
+
     def save_to_csv_v0(self, filename):
         """Saves object's data to file
 
@@ -142,6 +160,7 @@ class Track(object):
         mat = np.concatenate((new_time, new_xy), axis=1)
         np.savetxt(filename, mat, delimiter="\t")
 
+
     def move(self, difference):
         """Shifts all x,y by constant.
 
@@ -150,6 +169,7 @@ class Track(object):
         self.x += difference[0]
         self.y += difference[1]
 
+
     def scale(self, factor):
         """Multiplies all x,y by constant
 
@@ -157,10 +177,12 @@ class Track(object):
         self.x *= factor
         self.y *= factor
 
+
     def timestep(self):
         """Estimates size of time steps in timeline
         """
         return np.mean(np.diff(self.time))
+
 
     def time_interpolate(self, newtime):
         """Interpolates data according to new timeline
@@ -178,6 +200,7 @@ class Track(object):
         self.y = newy
         self.time = newtime
 
+
     def position_for_time(self, timevalue):
         """Interpolates coordinates for given time point
         """
@@ -189,12 +212,6 @@ class Track(object):
             newy[:, index] = np.interp(timevalue, self.time, self.y[:, index])
         return (newx, newy)
 
-    def load_from_csv(self, filename):
-        """Initializes object from data file.
-
-        Calls classic format. Maybe add format detection in future.
-        """
-        return self.load_from_csv_v0(filename)
 
     def save_to_csv(self, filename):
         """Saves object's data to file
@@ -202,6 +219,7 @@ class Track(object):
         Defaults to classic format.
         """
         return self.save_to_csv_v0(filename)
+
 
     def summary(self):
         """Returns text summary
@@ -211,6 +229,7 @@ class Track(object):
                 self.n_objects, np.amin(self.time), np.amax(self.time))
         else:
             return "Track: NOT initialized"
+
 
     def plot(self, filename, xlim=(-10, 10), ylim=(-10, 10)):
         """Plots trajectories into a file
@@ -248,6 +267,7 @@ class Track(object):
         animation.write_videofile(filename, fps=FPS)
         pass
 
+
     def bounce_square(self, position, direction, arena_opts):
         """Checks for boundary bouncing and returns corrected directions
         """
@@ -266,6 +286,7 @@ class Track(object):
         direction[np.logical_and(side, too_vertical)] = np.mod(np.pi - direction[np.logical_and(side, too_vertical)], 2 * np.pi)
         return direction
 
+
     def bounce_objects(self, position, direction, opts):
         """Checks for minimum inter-object spacing
         """
@@ -282,7 +303,6 @@ class Track(object):
             if count > 2:
                 direction[grouping == group_code] = np.mod(direction[grouping == group_code] + np.pi, 2 * np.pi)
         return direction
-
 
 
     def generate_vonmises(self, position, speed, kappa, opts,
@@ -321,6 +341,7 @@ class Track(object):
             # update direction
             direction += np.random.vonmises(mu=0, kappa=kappa, size=direction.shape)
         return self
+
 
 if __name__ == "__main__":
     # execute only if run as a script
