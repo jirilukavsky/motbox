@@ -14,6 +14,9 @@ Currently the package is tested and working with psychopy 1.9 and Python 2.
 ### Generators
 Path generation can be done either by your own scripts using the `Position` class to generate starting positions and `Track` to then `generate_trajectory`, or there are some shorthand functions in the `motbox.generator` file.
 
+### Visualisations
+the `motbox.visualisaions` contains function `plot` allowing to plot position data and/or trajectory data and a function `trajectory_video` which makes a video out of a valid `Trajectory` object.
+
 ### Command line
 Installation of the package comes with some command line options to generate tracks. If you have installed the package with pip, you can do following commands from command line:
 

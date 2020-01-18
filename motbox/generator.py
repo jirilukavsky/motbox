@@ -1,6 +1,7 @@
 import os
 import numpy as np
 from motbox import Track, Position
+import motbox.visualisations as vis
 
 
 def generate_straight_trajectory(n=1, speed=1, time=5, frequency=10, xlim=(-10,10), ylim=(-10,10), spacing=1,
@@ -52,7 +53,7 @@ def generate_straight_trajectory(n=1, speed=1, time=5, frequency=10, xlim=(-10,1
   track.generate_trajectory(position, speed, {"xlim": xlim, "ylim": ylim, "spacing": spacing}, 
     time = np.arange(0, time, 1/frequency))
   if save: track.save_to_csv(f'{filepath}.csv')
-  if plot: track.plot(f"{filepath}.png", xlim, ylim)
-  if video: track.make_video(f"{filepath}.mp4", xlim, ylim)
+  if plot: vis.plot(track.x, track.y, f"{filepath}.png", xlim, ylim)
+  if video: vis.trajectory_video(track, f"{filepath}.mp4", xlim, ylim)
 
   return track
