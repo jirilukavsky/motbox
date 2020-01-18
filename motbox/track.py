@@ -120,19 +120,19 @@ class Track(object):
         self.n_objects = 0
 
 
-    def load_from_csv(self, filename):
+    def load_from_csv(self, filename, delim="\t"):
         """Initializes object from data file.
 
         Calls classic format. Maybe add format detection in future.
         """
-        return self.load_from_csv_v0(filename)
+        return self.load_from_csv_v0(filename, delim)
 
 
-    def load_from_csv_v0(self, filename):
+    def load_from_csv_v0(self, filename, delim="\t"):
         """Initializes object from data file.
         Uses format from RepMot/RevMot studies.
         """
-        mat = np.genfromtxt(filename, delimiter='\t')
+        mat = np.genfromtxt(filename, delimiter=delim)
         # first column
 
         ncol = mat.shape[1]
