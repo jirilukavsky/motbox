@@ -12,7 +12,7 @@ COMPLETE = True
 class TestVisualisation(unittest.TestCase):
   def setUp(self):
     T1 = Track()
-    T1.load_from_csv(track_data_path)
+    T1.load_from_csv(track_data_path, delim=",")
     self.T1 = T1
 
 
