@@ -6,6 +6,7 @@ import numpy as np
 from numpy import testing
 from motbox import Track, Position
 
+COMPLETE = True
 track_data_path = os.path.join("test", "tracks", "T220.csv")
 
 class TestTrack(unittest.TestCase):
@@ -15,8 +16,8 @@ class TestTrack(unittest.TestCase):
     def setUp(self):
         T1 = Track()
         T2 = Track()        
-        T1.load_from_csv(track_data_path, delimiter=",")
-        T2.load_from_csv(track_data_path, delimiter=",")
+        T1.load_from_csv(track_data_path, delim=",")
+        T2.load_from_csv(track_data_path, delim=",")
         self.T1 = T1
         self.T2 = T2
         self.diff1 = (1.1, 1.2)
@@ -61,6 +62,7 @@ class TestTrack(unittest.TestCase):
         step = self.T1.timestep()
         self.assertAlmostEqual(step, 0.01)
 
+    @unittest.skipUnless(COMPLETE, "Time consuming video generation")
     def generate_vonmises(self):
       opts = {"xlim": (-10, 10), "ylim": (-10, 10), "spacing":2.}
       time = np.arange(0, 5, 0.5)
