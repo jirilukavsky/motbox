@@ -121,3 +121,6 @@ examples/*.png
 !examples/test_generated.png
 !examples/test_trajectory.png
 !examples/psychopy/img/*.png
+
+## Mac temporary files
+.DS_Store
