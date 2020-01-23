@@ -34,7 +34,7 @@ class Puppeteer(object):
         self.objects = []
         for index in range(ntimes):
             new_object = copy.copy(psychopyobject)
-            new_object.name = "{} copy {}".format(psychopyobject.name, index)
+            new_object.name = "{}_copy_{}".format(psychopyobject.name, index)
             self.objects.append(new_object)
 
     def draw_all(self):
@@ -48,3 +48,4 @@ class Puppeteer(object):
         """
         for object_1 in self.objects:
             object_1.setAutoDraw(False)
+

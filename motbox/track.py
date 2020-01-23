@@ -7,7 +7,6 @@ moving objects.
 
 import numpy as np
 from scipy.spatial import distance
-from scipy.sparse import csgraph
 
 class Position(object):
     """Represents position of n objects or one timeslice of Track
@@ -23,7 +22,6 @@ class Position(object):
         else:
             self.n_objects = len(x)
 
-
     def is_min_distance_complied(self, min_distance):
         """Checks if objects' distances are smaller than specified value
         """
@@ -32,7 +30,6 @@ class Position(object):
         coords[:, 1] = self.y
         dist = distance.pdist(coords)
         return np.all(dist > min_distance)
-
 
     # TODO - potentially make this static?
     def random_positions(self, n, xlim, ylim, min_distance):
@@ -66,7 +63,6 @@ class Position(object):
               break
         return self
 
-
     def circular_positions(self, n, radius, center=(0, 0)):
         """Put n objects on a circle with given center and diameter
         """
@@ -76,7 +72,6 @@ class Position(object):
         self.n_objects = n
         return self
 
-
     def move(self, difference):
         """Shifts all x,y by constant.
 
@@ -85,14 +80,12 @@ class Position(object):
         self.x += difference[0]
         self.y += difference[1]
 
-
     def scale(self, factor):
         """Multiplies all x,y by constant
 
         """
         self.x *= factor
         self.y *= factor
-
 
     def jitter_positions(self, amount, method="normal"):
         """Adds uniform or normal jitter to existing positions
@@ -179,7 +172,6 @@ class Track(object):
         self.x += difference[0]
         self.y += difference[1]
 
-
     def scale(self, factor):
         """Multiplies all x,y by constant
 
@@ -187,12 +179,10 @@ class Track(object):
         self.x *= factor
         self.y *= factor
 
-
     def timestep(self):
         """Estimates size of time steps in timeline
         """
         return np.mean(np.diff(self.time))
-
 
     def time_interpolate(self, newtime):
         """Interpolates data according to new timeline
@@ -209,7 +199,6 @@ class Track(object):
         self.x = newx
         self.y = newy
         self.time = newtime
-
 
     def position_for_time(self, timevalue):
         """Interpolates coordinates for given time point
@@ -236,10 +225,11 @@ class Track(object):
         """Returns text summary
         """
         if (not self.x is None) and (not self.y is None) and (not self.time is None):
-            return "Track: {} objects, time {} - {}".format(
+            report = "Track: {} objects, time {} - {}".format(
                 self.n_objects, np.amin(self.time), np.amax(self.time))
         else:
-            return "Track: NOT initialized"
+            report = "Track: NOT initialized"
+        return report
 
 
     def bounce_square(self, position, direction, arena_opts):
@@ -380,6 +370,7 @@ class Track(object):
             return np.random.vonmises(mu=0, kappa=kappa, size=n)
         return self.generate_trajectory(position, speed, opts, time, direction, jitter_func)
         
+
 
 if __name__ == "__main__":
     # execute only if run as a script

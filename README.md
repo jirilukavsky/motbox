@@ -9,7 +9,7 @@ This package can be used either as a controller for psychopy objects (see `Pupet
 ### Psychopy
 Look inside the `examples` folder for an example of [PsychoPy](https://www.psychopy.org/) integration. 
 
-Currently the package is tested and working with psychopy 1.9 and Python 2.
+Currently the package is tested and working with PsychoPy 1.9 and Python 2, and PsychoPy 3.2.4 and Python 3.
 
 ### Generators
 Path generation can be done either by your own scripts using the `Position` class to generate starting positions and `Track` to then `generate_trajectory`, or there are some shorthand functions in the `motbox.generator` file.
