@@ -7,6 +7,7 @@ moving objects.
 
 import numpy as np
 from scipy.spatial import distance
+from scipy.sparse import csgraph
 
 class Position(object):
     """Represents position of n objects or one timeslice of Track
@@ -44,12 +45,12 @@ class Position(object):
             definition of lower and upper limit of x positions
           ylim : touple of floats (2)
             definition of lower and upper limit of y positions
-        
+
         Returns
         -------
         Position
           Position object with randomly generated positions for n points
-        
+
         Examples
         -------
         position = Position()
@@ -60,7 +61,7 @@ class Position(object):
             self.x = np.random.uniform(low=xlim[0], high=xlim[1], size=(n, ))
             self.y = np.random.uniform(low=ylim[0], high=ylim[1], size=(n, ))
             if self.is_min_distance_complied(min_distance):
-              break
+                break
         return self
 
     def circular_positions(self, n, radius, center=(0, 0)):
@@ -96,7 +97,7 @@ class Position(object):
             jitter = np.random.uniform(low=-amount, high=amount, size=(2, self.n_objects))
         self.move((jitter[0, :], jitter[1, :]))
 
-    
+
 class Track(object):
     """Track object
 
@@ -239,7 +240,7 @@ class Track(object):
         ----------
           position : object of class motbox.Position
 
-          direction : 
+          direction :
 
 
           arena_opts : dictionary
@@ -283,66 +284,66 @@ class Track(object):
 
 
     # TODO - redo the opts parameter, as it includes REQUIRED parameters (such as spacing), so it is not much optional
-    def generate_trajectory(self, position, speed, opts, time = None, direction = None, jitter_func = None):
-      """Generates trajectory for given position, speed and 
+    def generate_trajectory(self, position, speed, opts, time=None, direction=None, jitter_func=None):
+        """Generates trajectory for given position, speed and
 
-      Parameters
-      ---------
-      position : object of class motbox.Position
-        defines original starting points and number of objects. See `Position.random_position` for a generator of random startup
-      speed : float or tuple
-        how far will the object move each "tick". Dependent on the length of the time parameter. If touple, it needs to have the same length as
-        is the number of positions. Allows separate speeds to be applied to each object. e.g. (speed for first object, speed for second, etc.)
-      opts : dictionary with optional parameters
-        currently allowed parameters are xlim, ylim, spacing. e.g. opts = {"xlim": (-10, 10), "ylim": (-10, 10), "spacing":2.}
-      time : tuple of float
-        array of floats to generate . e.g. np.arange(0, 5, 0.1) for a 5s long track generated each 0.1 s. 
-      direction : touple of float, optional
-        defines starting direction of movement for all objects. The angle is in radians (0-2pi). (default is None, generates randomly). 
-      jitter_func : function to add jitter
-        function to add jitter to otherwise straigth path.
+        Parameters
+        ---------
+        position : object of class motbox.Position
+            defines original starting points and number of objects. See `Position.random_position` for a generator of random startup
+        speed : float or tuple
+            how far will the object move each "tick". Dependent on the length of the time parameter. If touple, it needs to have the same length as
+            is the number of positions. Allows separate speeds to be applied to each object. e.g. (speed for first object, speed for second, etc.)
+        opts : dictionary with optional parameters
+            currently allowed parameters are xlim, ylim, spacing. e.g. opts = {"xlim": (-10, 10), "ylim": (-10, 10), "spacing":2.}
+        time : tuple of float
+            array of floats to generate . e.g. np.arange(0, 5, 0.1) for a 5s long track generated each 0.1 s.
+        direction : touple of float, optional
+            defines starting direction of movement for all objects. The angle is in radians (0-2pi). (default is None, generates randomly).
+        jitter_func : function to add jitter
+            function to add jitter to otherwise straigth path.
 
-      Returns
-      ---------
-      Returns self with generated track
-      """
-      if type(speed) is tuple and len(speed) != position.n_objects:
-        raise Exception("Length of speed is not the same as number of objects")
-      
-      self.n_objects = position.n_objects
-      # TODO - allow time to be passed as a number and np.arrange is run from within the function
-      # TODO - handle time is being none - it crashes
-      if not time is None:
-          self.time = time
-      if direction is None:
-          direction = np.random.uniform(low=0., high=2*np.pi, size=(self.n_objects,))
-      
-      self.x = np.zeros((len(self.time), self.n_objects))
-      self.y = np.zeros((len(self.time), self.n_objects))
-      self.x[0, :] = position.x
-      self.y[0, :] = position.y
-      step = np.asarray(speed) * self.timestep()
-      for frame in range(1, len(self.time)):
-          # check boundary
-          direction_old = direction.copy()
-          direction = self.bounce_square(position, direction, opts)
-          # check collisions
-          direction_old = direction.copy()
-          direction = self.bounce_objects(position, direction, opts)
+        Returns
+        ---------
+        Returns self with generated track
+        """
+        if type(speed) is tuple and len(speed) != position.n_objects:
+            raise Exception("Length of speed is not the same as number of objects")
 
-          position.move((np.sin(direction) * step, np.cos(direction) * step))
-          
-          #take information from the just calculated position
-          tx = self.x[frame - 1, :] + np.sin(direction) * step
-          ty = self.y[frame - 1, :] + np.cos(direction) * step
+        self.n_objects = position.n_objects
+        # TODO - allow time to be passed as a number and np.arrange is run from within the function
+        # TODO - handle time is being none - it crashes
+        if not time is None:
+            self.time = time
+        if direction is None:
+            direction = np.random.uniform(low=0., high=2*np.pi, size=(self.n_objects,))
 
-          # store coordinates
-          self.x[frame, :] = tx
-          self.y[frame, :] = ty
-          # update direction
-          if jitter_func is not None:
-            direction += jitter_func()
-      return self
+        self.x = np.zeros((len(self.time), self.n_objects))
+        self.y = np.zeros((len(self.time), self.n_objects))
+        self.x[0, :] = position.x
+        self.y[0, :] = position.y
+        step = np.asarray(speed) * self.timestep()
+        for frame in range(1, len(self.time)):
+            # check boundary
+            direction_old = direction.copy()
+            direction = self.bounce_square(position, direction, opts)
+            # check collisions
+            direction_old = direction.copy()
+            direction = self.bounce_objects(position, direction, opts)
+
+            position.move((np.sin(direction) * step, np.cos(direction) * step))
+
+            #take information from the just calculated position
+            tx = self.x[frame - 1, :] + np.sin(direction) * step
+            ty = self.y[frame - 1, :] + np.cos(direction) * step
+
+            # store coordinates
+            self.x[frame, :] = tx
+            self.y[frame, :] = ty
+            # update direction
+            if jitter_func is not None:
+                direction += jitter_func()
+        return self
 
 
     def generate_vonmises(self, position, speed, kappa, opts, time=None, direction=None):
@@ -351,16 +352,16 @@ class Track(object):
         Parameters
         ----------
         position:
-        speed : 
-        kappa : 
-        opts : 
-        time : 
+        speed :
+        kappa :
+        opts :
+        time :
 
         Return
         ---------
         self with generated tracjectories
         Ses Also
-        --------- 
+        ---------
         Track.generate_trajectory
         """
         # opt = {"xlim": (-10, 10), "ylim": (-10, 10), "spacing":2.}
@@ -369,7 +370,7 @@ class Track(object):
         def jitter_func():
             return np.random.vonmises(mu=0, kappa=kappa, size=n)
         return self.generate_trajectory(position, speed, opts, time, direction, jitter_func)
-        
+
 
 
 if __name__ == "__main__":

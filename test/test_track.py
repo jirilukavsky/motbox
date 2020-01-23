@@ -64,7 +64,7 @@ class TestTrack(unittest.TestCase):
 
     @unittest.skipUnless(COMPLETE, "Time consuming video generation")
     def generate_vonmises(self):
-      opts = {"xlim": (-10, 10), "ylim": (-10, 10), "spacing":2.}
-      time = np.arange(0, 5, 0.5)
-      self.T1.generate_vonmises(Positions().circular_positions(8, 5), speed= 3., kappa = 8, opts = opts, time = time)
-      self.assertTrue(True)
+        opts = {"xlim": (-10, 10), "ylim": (-10, 10), "spacing":2.}
+        time = np.arange(0, 5, 0.5)
+        self.T1.generate_vonmises(Positions().circular_positions(8, 5), speed= 3., kappa = 8, opts = opts, time = time)
+        self.assertTrue(True)
