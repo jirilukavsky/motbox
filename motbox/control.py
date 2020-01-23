@@ -36,3 +36,15 @@ class Puppeteer(object):
             new_object = copy.copy(psychopyobject)
             new_object.name = "{} copy {}".format(psychopyobject.name, index)
             self.objects.append(new_object)
+
+    def draw_all(self):
+        """Draws all objects in the objects array
+        """
+        for object_1 in self.objects:
+            object_1.setAutoDraw(True)
+
+    def hide_all(self):
+        """Stops drawing objects in the objects array
+        """
+        for object_1 in self.objects:
+            object_1.setAutoDraw(False)
