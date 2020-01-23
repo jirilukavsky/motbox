@@ -22,8 +22,14 @@ setuptools.setup(
       'numpy>=1.16',
       'moviepy',
       'matplotlib',
-      'scipy'
+      'scipy',
+      'click'
     ],
+    entry_points={
+      'console_scripts': [
+        'generate-straight-trajectory = motbox.commands:generate_straight_trajectory',
+      ]
+    },
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

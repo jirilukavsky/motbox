@@ -35,12 +35,12 @@
   <Routines>
     <Routine name="trial">
       <CodeComponent name="code">
-        <Param name="Begin Experiment" updates="constant" val="import numpy as np&amp;#10;&amp;#10;sys.path.insert(0, os.path.join('..', '..')) # to load module from neighbouring folder&amp;#10;import motbox as pymot&amp;#10;&amp;#10;track_filename = os.path.join('tracks', 'T220.csv')" valType="extendedCode"/>
+        <Param name="Begin Experiment" updates="constant" val="import numpy as np&amp;#10;from scipy.spatial import distance&amp;#10;from scipy.sparse import csgraph&amp;#10;import matplotlib.pyplot as plt&amp;#10;&amp;#10;sys.path.insert(0, os.path.join('..', '..')) # to load module from neighbouring folder&amp;#10;import motbox&amp;#10;&amp;#10;track_filename = os.path.join('tracks', 'T220.csv')" valType="extendedCode"/>
         <Param name="Begin JS Experiment" updates="constant" val="" valType="extendedCode"/>
         <Param name="Begin JS Routine" updates="constant" val="" valType="extendedCode"/>
-        <Param name="Begin Routine" updates="constant" val="T = pymot.Track()&amp;#10;T.load_from_csv(track_filename)&amp;#10;T.scale(50) # px per inch&amp;#10;print(T.summary())&amp;#10;&amp;#10;P = pymot.Puppeteer()&amp;#10;P.track = T&amp;#10;P.clone_template_psychopy(p1_template, 4)&amp;#10;print(P.objects)&amp;#10;&amp;#10;" valType="extendedCode"/>
+        <Param name="Begin Routine" updates="constant" val="T = motbox.Track()&amp;#10;T.load_from_csv(track_filename)&amp;#10;T.scale(50) # px per inch&amp;#10;&amp;#10;P = motbox.Puppeteer()&amp;#10;P.track = T&amp;#10;P.clone_template_psychopy(p1_template, 4)&amp;#10;&amp;#10;" valType="extendedCode"/>
         <Param name="Code Type" updates="None" val="Py" valType="str"/>
-        <Param name="Each Frame" updates="constant" val="stop_time = 4&amp;#10;&amp;#10;&amp;#10;if t &gt;= 0 and t &lt;= stop_time:&amp;#10;    P.update_positions_psychopy(t)&amp;#10;    P.draw_all()&amp;#10;&amp;#10;if t &gt; stop_time and t &lt;= (stop_time + 1):&amp;#10;    P.update_positions_psychopy(4)&amp;#10;    P.draw_all()&amp;#10;&amp;#10;if t &gt; (stop_time + 1):&amp;#10;    P.hide_all()&amp;#10;    &amp;#10;" valType="extendedCode"/>
+        <Param name="Each Frame" updates="constant" val="stop_time = 4&amp;#10;&amp;#10;&amp;#10;if t &gt;= 0 and t &lt;= stop_time:&amp;#10;    P.update_positions_psychopy(t)&amp;#10;    P.draw_all()&amp;#10;&amp;#10;if t &gt; stop_time and t &lt;= (stop_time + 1):&amp;#10;    P.update_positions_psychopy(4)&amp;#10;    P.draw_all()&amp;#10;&amp;#10;if t &gt; (stop_time + 1):&amp;#10;    P.hide_all()&amp;#10;" valType="extendedCode"/>
         <Param name="Each JS Frame" updates="constant" val="" valType="extendedCode"/>
         <Param name="End Experiment" updates="constant" val="" valType="extendedCode"/>
         <Param name="End JS Experiment" updates="constant" val="" valType="extendedCode"/>

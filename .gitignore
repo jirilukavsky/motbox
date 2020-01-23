@@ -108,6 +108,9 @@ tmp/
 ## VSCODE
 .vscode/
 
+## Testing code
+*playground*
+
 ## Example files
 examples/psychopy/data/
 examples/psychopy/demo_lastrun.py
@@ -118,3 +121,6 @@ examples/*.png
 !examples/test_generated.png
 !examples/test_trajectory.png
 !examples/psychopy/img/*.png
+
+## Mac temporary files
+.DS_Store

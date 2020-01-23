@@ -6,8 +6,7 @@ import numpy as np
 from numpy import testing
 from motbox import Track, Position
 
-COMPLETE = False
-track_data_path = os.path.join("test", "tracks", "T220c.csv")
+track_data_path = os.path.join("test", "tracks", "T220.csv")
 
 class TestTrack(unittest.TestCase):
     # https://docs.python.org/2/library/unittest.html
@@ -30,9 +29,8 @@ class TestTrack(unittest.TestCase):
     def tearDown(self):
         # removes generated files so they are not left in .git by accident
         for f in os.listdir("test"):
-            if re.search(".*(.png)|(.mp4)", f):
+            if re.search(".*(.csv)", f):
                 os.remove(os.path.join("test", f))
-
 
     def test_move_x(self):
         oldx = self.T1.x.copy()
@@ -63,3 +61,8 @@ class TestTrack(unittest.TestCase):
         step = self.T1.timestep()
         self.assertAlmostEqual(step, 0.01)
 
+    def generate_vonmises(self):
+      opts = {"xlim": (-10, 10), "ylim": (-10, 10), "spacing":2.}
+      time = np.arange(0, 5, 0.5)
+      self.T1.generate_vonmises(Positions().circular_positions(8, 5), speed= 3., kappa = 8, opts = opts, time = time)
+      self.assertTrue(True)
