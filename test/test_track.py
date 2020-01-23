@@ -6,7 +6,6 @@ import numpy as np
 from numpy import testing
 from motbox import Track, Position
 
-COMPLETE = False
 track_data_path = os.path.join("test", "tracks", "T220.csv")
 
 class TestTrack(unittest.TestCase):
@@ -30,9 +29,8 @@ class TestTrack(unittest.TestCase):
     def tearDown(self):
         # removes generated files so they are not left in .git by accident
         for f in os.listdir("test"):
-            if re.search(".*(.png)|(.mp4)", f):
+            if re.search(".*(.csv)", f):
                 os.remove(os.path.join("test", f))
-
 
     def test_move_x(self):
         oldx = self.T1.x.copy()
@@ -63,20 +61,8 @@ class TestTrack(unittest.TestCase):
         step = self.T1.timestep()
         self.assertAlmostEqual(step, 0.01)
 
-    @unittest.skipUnless(COMPLETE, "Time consuming video generation")
-    def test_generate_vonmises(self):
-        #, position, speed, kappa, time=None, direction=None):
-        self.T1.generate_vonmises(
-            Position().circular_positions(8, 5), 5., 40)
-        self.T1.plot(os.path.join("test", "test_generated.png"))
-        self.T1.make_video(os.path.join("test", "test_generated.mp4"))
-        self.assertTrue(True)
-
-    def test_plot(self):
-        self.T1.plot(os.path.join("test", "test_trajectory.png"))
-        self.assertTrue(True)
-
-    @unittest.skipUnless(COMPLETE, "Time consuming video generation")
-    def test_make_video(self):
-        self.T1.make_video(os.path.join("test", "test_video.mp4"))
-        self.assertTrue(True)
+    def generate_vonmises(self):
+      opts = {"xlim": (-10, 10), "ylim": (-10, 10), "spacing":2.}
+      time = np.arange(0, 5, 0.5)
+      self.T1.generate_vonmises(Positions().circular_positions(8, 5), speed= 3., kappa = 8, opts = opts, time = time)
+      self.assertTrue(True)

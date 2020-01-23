@@ -8,12 +8,6 @@ moving objects.
 import numpy as np
 from scipy.spatial import distance
 from scipy.sparse import csgraph
-import matplotlib.pyplot as plt
-
-
-from moviepy.editor import VideoClip
-from moviepy.video.io.bindings import mplfig_to_npimage
-
 
 class Position(object):
     """Represents position of n objects or one timeslice of Track
@@ -40,16 +34,36 @@ class Position(object):
         return np.all(dist > min_distance)
 
 
+    # TODO - potentially make this static?
     def random_positions(self, n, xlim, ylim, min_distance):
         """Populates square ares (xlim x ylim) with n objects.
         Checks minimum inter-object distance
+
+        Parameters
+        ---------
+          n : int
+            number of points to simulate
+          xlim : touple of floats (2)
+            definition of lower and upper limit of x positions
+          ylim : touple of floats (2)
+            definition of lower and upper limit of y positions
+        
+        Returns
+        -------
+        Position
+          Position object with randomly generated positions for n points
+        
+        Examples
+        -------
+        position = Position()
+        position.random_positions(5, (-10,10), (-10,10), 1)
         """
         while True:
             self.n_objects = n
             self.x = np.random.uniform(low=xlim[0], high=xlim[1], size=(n, ))
             self.y = np.random.uniform(low=ylim[0], high=ylim[1], size=(n, ))
             if self.is_min_distance_complied(min_distance):
-                break
+              break
         return self
 
 
@@ -89,19 +103,7 @@ class Position(object):
             jitter = np.random.uniform(low=-amount, high=amount, size=(2, self.n_objects))
         self.move((jitter[0, :], jitter[1, :]))
 
-
-    def plot(self, filename, xlim=(-10, 10), ylim=(-10, 10)):
-        """Plots positions into file
-        """
-        plt.figure()
-        plt.plot(self.x, self.y, "o")
-        plt.xlabel = "x"
-        plt.ylabel = "y"
-        plt.xlim(xlim)
-        plt.ylim(ylim)
-        plt.savefig(filename)
-
-
+    
 class Track(object):
     """Track object
 
@@ -118,19 +120,19 @@ class Track(object):
         self.n_objects = 0
 
 
-    def load_from_csv(self, filename):
+    def load_from_csv(self, filename, delim="\t"):
         """Initializes object from data file.
 
         Calls classic format. Maybe add format detection in future.
         """
-        return self.load_from_csv_v0(filename)
+        return self.load_from_csv_v0(filename, delim)
 
 
-    def load_from_csv_v0(self, filename):
+    def load_from_csv_v0(self, filename, delim="\t"):
         """Initializes object from data file.
         Uses format from RepMot/RevMot studies.
         """
-        mat = np.genfromtxt(filename, delimiter='\t')
+        mat = np.genfromtxt(filename, delimiter=delim)
         # first column
 
         ncol = mat.shape[1]
@@ -144,6 +146,14 @@ class Track(object):
             # error
             pass
         pass
+
+
+    def save_to_csv(self, filename):
+        """Saves object's data to file
+
+        Defaults to classic format.
+        """
+        return self.save_to_csv_v0(filename)
 
 
     def save_to_csv_v0(self, filename):
@@ -203,6 +213,15 @@ class Track(object):
 
     def position_for_time(self, timevalue):
         """Interpolates coordinates for given time point
+
+        Parameters
+        ---------
+          timevalue : float
+            time at which to interpolate the position
+
+        Returns
+        ---------
+          touple (x, y) of arrays for interpolated positions at time
         """
         n_objects = self.n_objects
         newx = np.zeros((1, n_objects))
@@ -211,14 +230,6 @@ class Track(object):
             newx[:, index] = np.interp(timevalue, self.time, self.x[:, index])
             newy[:, index] = np.interp(timevalue, self.time, self.y[:, index])
         return (newx, newy)
-
-
-    def save_to_csv(self, filename):
-        """Saves object's data to file
-
-        Defaults to classic format.
-        """
-        return self.save_to_csv_v0(filename)
 
 
     def summary(self):
@@ -231,45 +242,21 @@ class Track(object):
             return "Track: NOT initialized"
 
 
-    def plot(self, filename, xlim=(-10, 10), ylim=(-10, 10)):
-        """Plots trajectories into a file
-        """
-        plt.figure()
-        plt.plot(self.x, self.y, "k")
-        plt.xlabel = "x"
-        plt.ylabel = "y"
-        plt.xlim(xlim)
-        plt.ylim(ylim)
-        plt.savefig(filename)
-
-    def make_video(self, filename, xlim=(-10, 10), ylim=(-10, 10), callback=None, axisOff=True):
-        WIDTH = 900
-        HEIGHT = 600
-        DPI = 150
-        FPS = 25
-        DURATION = np.max(self.time) - np.min(self.time)
-
-        fig, axis = plt.subplots(figsize=(1.0 * WIDTH / DPI, 1.0 * HEIGHT / DPI), dpi=DPI)
-        def make_frame(t):
-            axis.clear()
-            (tx, ty) = self.position_for_time(t + np.min(self.time))
-            axis.plot(tx, ty, "ko")
-            axis.set_xlim(xlim)
-            axis.set_ylim(ylim)
-            axis.set_title("Time {:.2f} s".format(t))
-            if not callback is None:
-                callback(axis)
-            if axisOff:
-                plt.axis('off')
-            return mplfig_to_npimage(fig)
-        animation = VideoClip(make_frame, duration=DURATION)
-        #animation.write_gif(filename, fps=FPS)
-        animation.write_videofile(filename, fps=FPS)
-        pass
-
-
     def bounce_square(self, position, direction, arena_opts):
         """Checks for boundary bouncing and returns corrected directions
+
+        Parameters
+        ----------
+          position : object of class motbox.Position
+
+          direction : 
+
+
+          arena_opts : dictionary
+            DESCRIPTION
+
+        Returns
+
         """
         xlim = arena_opts["xlim"]
         ylim = arena_opts["ylim"]
@@ -305,43 +292,94 @@ class Track(object):
         return direction
 
 
-    def generate_vonmises(self, position, speed, kappa, opts,
-                          time=None, direction=None):
+    # TODO - redo the opts parameter, as it includes REQUIRED parameters (such as spacing), so it is not much optional
+    def generate_trajectory(self, position, speed, opts, time = None, direction = None, jitter_func = None):
+      """Generates trajectory for given position, speed and 
+
+      Parameters
+      ---------
+      position : object of class motbox.Position
+        defines original starting points and number of objects. See `Position.random_position` for a generator of random startup
+      speed : float or tuple
+        how far will the object move each "tick". Dependent on the length of the time parameter. If touple, it needs to have the same length as
+        is the number of positions. Allows separate speeds to be applied to each object. e.g. (speed for first object, speed for second, etc.)
+      opts : dictionary with optional parameters
+        currently allowed parameters are xlim, ylim, spacing. e.g. opts = {"xlim": (-10, 10), "ylim": (-10, 10), "spacing":2.}
+      time : tuple of float
+        array of floats to generate . e.g. np.arange(0, 5, 0.1) for a 5s long track generated each 0.1 s. 
+      direction : touple of float, optional
+        defines starting direction of movement for all objects. The angle is in radians (0-2pi). (default is None, generates randomly). 
+      jitter_func : function to add jitter
+        function to add jitter to otherwise straigth path.
+
+      Returns
+      ---------
+      Returns self with generated track
+      """
+      if type(speed) is tuple and len(speed) != position.n_objects:
+        raise Exception("Length of speed is not the same as number of objects")
+      
+      self.n_objects = position.n_objects
+      # TODO - allow time to be passed as a number and np.arrange is run from within the function
+      # TODO - handle time is being none - it crashes
+      if not time is None:
+          self.time = time
+      if direction is None:
+          direction = np.random.uniform(low=0., high=2*np.pi, size=(self.n_objects,))
+      
+      self.x = np.zeros((len(self.time), self.n_objects))
+      self.y = np.zeros((len(self.time), self.n_objects))
+      self.x[0, :] = position.x
+      self.y[0, :] = position.y
+      step = np.asarray(speed) * self.timestep()
+      for frame in range(1, len(self.time)):
+          # check boundary
+          direction_old = direction.copy()
+          direction = self.bounce_square(position, direction, opts)
+          # check collisions
+          direction_old = direction.copy()
+          direction = self.bounce_objects(position, direction, opts)
+
+          position.move((np.sin(direction) * step, np.cos(direction) * step))
+          
+          #take information from the just calculated position
+          tx = self.x[frame - 1, :] + np.sin(direction) * step
+          ty = self.y[frame - 1, :] + np.cos(direction) * step
+
+          # store coordinates
+          self.x[frame, :] = tx
+          self.y[frame, :] = ty
+          # update direction
+          if jitter_func is not None:
+            direction += jitter_func()
+      return self
+
+
+    def generate_vonmises(self, position, speed, kappa, opts, time=None, direction=None):
         """Generates trajectories from starting positions and von Mises sampling
+
+        Parameters
+        ----------
+        position:
+        speed : 
+        kappa : 
+        opts : 
+        time : 
+
+        Return
+        ---------
+        self with generated tracjectories
+        Ses Also
+        --------- 
+        Track.generate_trajectory
         """
         # opt = {"xlim": (-10, 10), "ylim": (-10, 10), "spacing":2.}
-        if not time is None:
-            self.time = time
-        timestep = self.timestep()
+
         n = position.n_objects
-        if direction is None:
-            direction = np.random.uniform(low=0., high=2*np.pi, size=(n,))
-        self.x = np.zeros((len(self.time), n))
-        self.y = np.zeros((len(self.time), n))
-        self.n_objects = n
-        step = speed * timestep
-        self.x[0, :] = position.x
-        self.y[0, :] = position.y
-        for frame in range(1, len(self.time)):
-            # check boundary
-            direction_old = direction.copy()
-            direction = self.bounce_square(position, direction, opts)
-            # check collisions
-            direction_old = direction.copy()
-            direction = self.bounce_objects(position, direction, opts)
-
-            position.move((np.sin(direction) * step, np.cos(direction) * step))
-
-            tx = self.x[frame - 1, :] + np.sin(direction) * step
-            ty = self.y[frame - 1, :] + np.cos(direction) * step
-
-            # store coordinates
-            self.x[frame, :] = tx
-            self.y[frame, :] = ty
-            # update direction
-            direction += np.random.vonmises(mu=0, kappa=kappa, size=direction.shape)
-        return self
-
+        def jitter_func():
+            return np.random.vonmises(mu=0, kappa=kappa, size=n)
+        return self.generate_trajectory(position, speed, opts, time, direction, jitter_func)
+        
 
 if __name__ == "__main__":
     # execute only if run as a script
